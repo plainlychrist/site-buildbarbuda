@@ -21,6 +21,16 @@ First, follow the **eight (8)** instructions on the [Amazon EC2 Container Servic
 Then do these steps:
 ```bash
 docker rm -f site-web # this is fine if this fails
-docker run -d -p 80:80 --name site-web --env WEB_ADMIN_PASSWORD=...make...up...a...password personal/site-web -t "^$(curl http://169.254.169.254/latest/meta-data/public-hostname)$"
+docker run -d -p 80:80 --name site-web --env WEB_ADMIN_PASSWORD=...make...up...a...password personal/site-web -t "^$(curl -s http://169.254.169.254/latest/meta-data/public-hostname)$"
 docker logs --follow site-web
+```
+
+## Linking Active Configuration To Git Workspace
+
+Similar instructions as `Linux on Amazon EC2`, and replace the `run` line with the following lines:
+
+```bash
+git clone https://github.com/plainlychrist/site-web.git # skip this if you already have the source code
+cd site-web
+docker run -d -p 80:80 --name site-web -v $PWD/storage-config:/var/lib/site/storage-config --env WEB_ADMIN_PASSWORD=...make...up...a...password personal/site-web
 ```
