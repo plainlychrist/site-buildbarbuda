@@ -9,3 +9,18 @@ The main design principle for PlainlyChrist.org is to be transparent.
 * **Open-source**: All the logic (the code and configuration) is fully open-source, with a truly unrestrictive license (Apache v2.0). That means you don't have to pay anybody or sign contracts to examine what we are doing.
 * **Open-data**: All the content (the text and the links) is fully open data. That means you don't have to pay anybody or sign contracts to see what information we use.
 * **Reproducible**: Anybody with a modern computer can create a full copy of the existing website. That means if you dislike what PlainlyChrist.org is doing, you have the freedom to start your own I-Want-Something-Better-Than-PlainlyChrist.org.
+
+# Running
+
+## Linux on Amazon EC2
+
+These instructions are for Amazon Linux only. Your mileage may vary if you launched with any other Linux distribution (RedHat, etc.).
+
+First, follow the **eight (8)** instructions on the [Amazon EC2 Container Service "Installing Docker"](http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html#install_docker) section.
+
+Then do these steps:
+```bash
+docker rm -f site-web # this is fine if this fails
+docker run -d -p 80:80 --name site-web --env WEB_ADMIN_PASSWORD=...make...up...a...password personal/site-web -t "^$(curl http://169.254.169.254/latest/meta-data/public-hostname)$"
+docker logs --follow site-web
+```

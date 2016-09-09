@@ -2,13 +2,24 @@
 # vim: set tabstop=2 shiftwidth=2 expandtab:
 set -euo pipefail
 
+usage()
+{
+  echo "Options: " >&2
+    echo "-h   Display this help" >&2
+    echo "-t   Add a trusted host pattern, as per https://www.drupal.org/node/1992030. Can be repeated" >&2
+    echo "-m   Use MySQL. Expects MYSQL_DATABASE, MYSQL_USER and MYSQL_PASSWORD environment variables, with 'db' as the hostname" >&2
+}
+
+TRUSTED_HOST_PATTERNS=()
 USE_MYSQL=0
-while getopts "hm" opt; do
+while getopts "hmt:" opt; do
   case $opt in
     h)
-      echo "-h   Display this help" >&2
-      echo "-m   Use MySQL. Expects MYSQL_DATABASE, MYSQL_USER and MYSQL_PASSWORD environment variables, with 'db' as the hostname" >&2
+      usage
       exit 0
+      ;;
+    t)
+      TRUSTED_HOST_PATTERNS+=( $OPTARG )
       ;;
     m)
       USE_MYSQL=1
@@ -58,8 +69,25 @@ if drush core-status drupal-settings-file | grep MISSING; then
         config_installer install_configure_form.update_status_module='array(FALSE,FALSE)' ;
 
     else
-
       echo Installing a starter site with Drush site-install, with email notification disabled ...
+
+      echo Generating the global Drupal settings ...
+
+      # https://www.drupal.org/node/1992030
+      SETTINGS=/var/www/html/sites/default/default.settings.php
+      n_elements=${#TRUSTED_HOST_PATTERNS[@]}
+      max_index=$((n_elements - 1))
+      if [[ $n_elements -gt 0 ]]; then
+        echo >> ${SETTINGS}
+        echo '# Installed by site-web entry.sh from "docker run ... -t ..."' >> ${SETTINGS}
+        echo '$settings["trusted_host_patterns"] = array(' >> ${SETTINGS}
+        for ((i = 0; i <= max_index; i++)); do
+          echo "'${TRUSTED_HOST_PATTERNS[i]}'," >> ${SETTINGS}
+        done
+        echo ');' >> ${SETTINGS}
+      fi
+
+      echo Doing the site installation ...
       drush -y site-install --db-url="${DB_URL}" \
         --account-name=admin \
         --account-pass="${WEB_ADMIN_PASSWORD}" \
@@ -87,6 +115,9 @@ if drush core-status drupal-settings-file | grep MISSING; then
 
       echo Enabling the Security Review module ...
       drush -y pm-enable security_review
+
+      echo Enabling the Update Manager module ...
+      drush -y pm-enable update
     fi 
 fi
 
