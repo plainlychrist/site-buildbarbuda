@@ -59,113 +59,102 @@ fi
 # Install drupal, specifically sites/default/settings.php
 if drush core-status drupal-settings-file | grep MISSING; then
 
-    if test -e /var/lib/site/config/sites/default/sync; then
+  echo Installing a starter site with Drush site-install, with email notification disabled ...
 
-      install -m 666 /var/www/html/sites/default/default.settings.php /var/www/html/sites/default/settings.php
-      echo "\$config_directories[CONFIG_SYNC_DIRECTORY] = '/var/lib/site/config/sites/default/sync';" >> /var/www/html/sites/default/settings.php
-      drush -y site-install --db-url="${DB_URL}" \
-        --account-name=admin \
-        --account-pass="${WEB_ADMIN_PASSWORD}" \
-        config_installer install_configure_form.update_status_module='array(FALSE,FALSE)' ;
+  echo Generating the global Drupal settings ...
 
-    else
-      echo Installing a starter site with Drush site-install, with email notification disabled ...
+  # https://www.drupal.org/node/1992030
+  SETTINGS=/var/www/html/sites/default/default.settings.php
+  n_elements=${#TRUSTED_HOST_PATTERNS[@]}
+  max_index=$((n_elements - 1))
+  if [[ $n_elements -gt 0 ]]; then
+    echo >> ${SETTINGS}
+    echo '# Installed by site-web entry.sh from "docker run ... -t ..."' >> ${SETTINGS}
+    echo '$settings["trusted_host_patterns"] = array(' >> ${SETTINGS}
+    for ((i = 0; i <= max_index; i++)); do
+      echo "'${TRUSTED_HOST_PATTERNS[i]}'," >> ${SETTINGS}
+    done
+    echo ');' >> ${SETTINGS}
+  fi
 
-      echo Generating the global Drupal settings ...
+  # Use file-based configuration rather than database-base configuration
+  # https://www.drupal.org/node/2291587
 
-      # https://www.drupal.org/node/1992030
-      SETTINGS=/var/www/html/sites/default/default.settings.php
-      n_elements=${#TRUSTED_HOST_PATTERNS[@]}
-      max_index=$((n_elements - 1))
-      if [[ $n_elements -gt 0 ]]; then
-        echo >> ${SETTINGS}
-        echo '# Installed by site-web entry.sh from "docker run ... -t ..."' >> ${SETTINGS}
-        echo '$settings["trusted_host_patterns"] = array(' >> ${SETTINGS}
-        for ((i = 0; i <= max_index; i++)); do
-          echo "'${TRUSTED_HOST_PATTERNS[i]}'," >> ${SETTINGS}
-        done
-        echo ');' >> ${SETTINGS}
-      fi
+  STORAGE_CONFIG=/var/lib/site/storage-config
+  HAVE_STORED_CONFIG=1
+  if [[ ! -e ${STORAGE_CONFIG}/active/system.site.yml ]]; then # there is no Docker mount to a 'git' workspace
+    HAVE_STORED_CONFIG=0
+    install -d ${STORAGE_CONFIG}
+    install -d ${STORAGE_CONFIG}/staging # configs for manual import should never be modified by the running Drupal system
+    install -o www-data -m 755 -d ${STORAGE_CONFIG}/active ${STORAGE_CONFIG}/sync
+  fi
+  echo >> ${SETTINGS}
+  echo '# Installed by site-web entry.sh' >> ${SETTINGS}
+  echo "\$settings['bootstrap_config_storage'] = array('Drupal\Core\Config\BootstrapConfigStorageFactory', 'getFileStorage');" >> ${SETTINGS}
+  echo "\$config_directories = array(
+     CONFIG_ACTIVE_DIRECTORY => '${STORAGE_CONFIG}/active/',
+     CONFIG_STAGING_DIRECTORY => '${STORAGE_CONFIG}/staging/',
+     CONFIG_SYNC_DIRECTORY => '${STORAGE_CONFIG}/sync/',
+    );" >> ${SETTINGS}
 
-      # Use file-based configuration rather than database-base configuration
-      # https://www.drupal.org/node/2291587
+  SERVICES=/var/www/html/sites/default/services.yml
+  echo >> ${SERVICES}
+  echo '# Installed by site-web entry.sh' >> ${SERVICES}
+  echo 'services:' >> ${SERVICES}
+  echo '  config.storage:' >> ${SERVICES}
+  echo '    class: Drupal\Core\Config\CachedStorage' >> ${SERVICES}
+  echo "    arguments: ['@config.storage.active', '@cache.config']" >> ${SERVICES}
+  echo '  config.storage.active:' >> ${SERVICES}
+  echo '    class: Drupal\Core\Config\FileStorage' >> ${SERVICES}
+  echo '    factory: Drupal\Core\Config\FileStorageFactory::getActive' >> ${SERVICES}
 
-      STORAGE_CONFIG=/var/lib/site/storage-config
-      HAVE_STORED_CONFIG=1
-      if [[ ! -e ${STORAGE_CONFIG} ]]; then # there is no Docker mount to a 'git' workspace
-        HAVE_STORED_CONFIG=0
-        install -d ${STORAGE_CONFIG}
-        install -d ${STORAGE_CONFIG}/staging # configs for manual import should never be modified by the running Drupal system
-        install -o www-data -m 755 -d ${STORAGE_CONFIG}/active ${STORAGE_CONFIG}/sync
-      fi
-      echo >> ${SETTINGS}
-      echo '# Installed by site-web entry.sh' >> ${SETTINGS}
-      echo "\$settings['bootstrap_config_storage'] = array('Drupal\Core\Config\BootstrapConfigStorageFactory', 'getFileStorage');" >> ${SETTINGS}
-      echo "\$config_directories = array(
-         CONFIG_ACTIVE_DIRECTORY => '${STORAGE_CONFIG}/active/',
-         CONFIG_STAGING_DIRECTORY => '${STORAGE_CONFIG}/staging/',
-         CONFIG_SYNC_DIRECTORY => '${STORAGE_CONFIG}/sync/',
-        );" >> ${SETTINGS}
+  if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
+    echo Doing an already-active configuration site installation ...
 
-      SERVICES=/var/www/html/sites/default/services.yml
-      echo >> ${SERVICES}
-      echo '# Installed by site-web entry.sh' >> ${SERVICES}
-      echo 'services:' >> ${SERVICES}
-      echo '  config.storage:' >> ${SERVICES}
-      echo '    class: Drupal\Core\Config\CachedStorage' >> ${SERVICES}
-      echo "    arguments: ['@config.storage.active', '@cache.config']" >> ${SERVICES}
-      echo '  config.storage.active:' >> ${SERVICES}
-      echo '    class: Drupal\Core\Config\FileStorage' >> ${SERVICES}
-      echo '    factory: Drupal\Core\Config\FileStorageFactory::getActive' >> ${SERVICES}
+    # TODO: do a database restore first ... the configuration refers to records in the database.
+    # without a database with those records, the config_installer later will fail with Drupal\Core\Database\ConnectionNotDefinedException
 
-      if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
-        echo Doing an already-active configuration site installation ...
+    drush -y site-install --db-url="${DB_URL}" \
+      --account-name=admin \
+      --account-pass="${WEB_ADMIN_PASSWORD}" \
+      config_installer install_configure_form.update_status_module='array(FALSE,FALSE)'
 
-        # TODO: do a database restore first ... the configuration refers to records in the database.
-        # without a database with those records, the config_installer later will fail with Drupal\Core\Database\ConnectionNotDefinedException
+  else
+    echo Doing a no-configuration site installation ...
 
-        drush -y site-install --db-url="${DB_URL}" \
-          --account-name=admin \
-          --account-pass="${WEB_ADMIN_PASSWORD}" \
-          config_installer install_configure_form.update_status_module='array(FALSE,FALSE)'
+    drush -y site-install --db-url="${DB_URL}" \
+      --account-name=admin \
+      --account-pass="${WEB_ADMIN_PASSWORD}" \
+      --account-mail=no-reply@plainlychrist.org \
+      --site-name="PlainlyChrist.org" \
+      --site-mail=no-reply@plainlychrist.org \
+      standard install_configure_form.update_status_module='array(FALSE,FALSE)'
+  fi
 
-      else
-        echo Doing a no-configuration site installation ...
+  if [[ $USE_SQLITE -eq 1 ]]; then
+    # Fix permissions as per https://api.drupal.org/api/drupal/core!INSTALL.sqlite.txt/8.1.x
+    chown www-data "${SQLITE_DIR}" "${SQLITE_LOCATION}"
+    chmod 600 "${SQLITE_LOCATION}"
+  fi
 
-        drush -y site-install --db-url="${DB_URL}" \
-          --account-name=admin \
-          --account-pass="${WEB_ADMIN_PASSWORD}" \
-          --account-mail=no-reply@plainlychrist.org \
-          --site-name="PlainlyChrist.org" \
-          --site-mail=no-reply@plainlychrist.org \
-          standard install_configure_form.update_status_module='array(FALSE,FALSE)'
-      fi
+  # Enable the modules that must be present, regardless of configuration.
+  # Note that configuration in active/ will automatically enable any module it refers to, so
+  # the modules listed below are only really relevant for a barebones no-configuration system.
+  # Basically, Day 1 of the source code.
 
-      if [[ $USE_SQLITE -eq 1 ]]; then
-        # Fix permissions as per https://api.drupal.org/api/drupal/core!INSTALL.sqlite.txt/8.1.x
-        chown www-data "${SQLITE_DIR}" "${SQLITE_LOCATION}"
-        chmod 600 "${SQLITE_LOCATION}"
-      fi
+  echo Enabling the Security Review module ...
+  drush -y pm-enable security_review
 
-      # Enable the modules that must be present, regardless of configuration.
-      # Note that configuration in active/ will automatically enable any module it refers to, so
-      # the modules listed below are only really relevant for a barebones no-configuration system.
-      # Basically, Day 1 of the source code.
+  echo Enabling the Update Manager module ...
+  drush -y pm-enable update
 
-      echo Enabling the Security Review module ...
-      drush -y pm-enable security_review
-
-      echo Enabling the Update Manager module ...
-      drush -y pm-enable update
-
-      echo Securing POSIX permissions ...
-      # https://www.drupal.org/node/244924
-      find /var/www/html -type f -exec chmod a-w {} \;
-      find /var/www/html -type d -exec chmod a-w {} \;
-      chown -R www-data /var/www/html/sites/default/files
-      find /var/www/html/sites/default/files -type d -exec chmod u+w {} \;
-      chown -R www-data /var/lib/site/storage-config/active /var/lib/site/storage-config/sync
-    fi 
+  echo Securing POSIX permissions ...
+  # https://www.drupal.org/node/244924
+  find /var/www/html -type f -exec chmod a-w {} \;
+  find /var/www/html -type d -exec chmod a-w {} \;
+  chown -R www-data /var/www/html/sites/default/files
+  find /var/www/html/sites/default/files -type d -exec chmod u+w {} \;
+  chown -R www-data /var/lib/site/storage-config/active /var/lib/site/storage-config/sync
 fi
 
 # Then run CMD (apache2-foreground) from php:apache in https://hub.docker.com/_/php/
