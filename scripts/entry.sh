@@ -1,35 +1,44 @@
 #!/bin/bash
-# vim: set tabstop=2 shiftwidth=2 expandtab:
+# vim: set tabstop=2 shiftwidth=2 expandtab smartindent:
 set -euo pipefail
 
 usage()
 {
   echo "Options: " >&2
-    echo "-h   Display this help" >&2
-    echo "-t   Add a trusted host pattern, as per https://www.drupal.org/node/1992030. Can be repeated" >&2
-    echo "-m   Use MySQL. Expects MYSQL_DATABASE, MYSQL_USER and MYSQL_PASSWORD environment variables, with 'db' as the hostname" >&2
+    echo "-h                              Display this help" >&2
+    echo "-t|--trust-host-pattern REGEX   Add a trusted host pattern, as per https://www.drupal.org/node/1992030. Can be repeated" >&2
+    echo "--trust-this-ec2-host           Add the public DNS name of this EC2 host as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
+    echo "-m|--use-mysql                  Use MySQL. Expects MYSQL_DATABASE, MYSQL_USER and MYSQL_PASSWORD environment variables, with 'db' as the hostname" >&2
 }
 
+# process command line
 TRUSTED_HOST_PATTERNS=()
 USE_MYSQL=0
-while getopts "hmt:" opt; do
-  case $opt in
-    h)
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
       usage
-      exit 0
+      exit 2
       ;;
-    t)
-      TRUSTED_HOST_PATTERNS+=( $OPTARG )
-      ;;
-    m)
+    -m|--use-mysql)
       USE_MYSQL=1
+      shift
       ;;
-    \?)
-      echo "Invalid option: -$OPTARG" >&2
+    -t|--trust-host-pattern)
+      TRUSTED_HOST_PATTERNS+=( $2 )
+      shift 2
+      ;;
+    --trust-this-ec2-host)
+      PUBLIC_HOSTNAME="^$(curl -s http://169.254.169.254/latest/meta-data/public-hostname)$"
+      TRUSTED_HOST_PATTERNS+=( ${PUBLIC_HOSTNAME} )
+      shift
+      ;;
+    *)
+      usage
+      exit 2
       ;;
   esac
 done
-shift $((OPTIND-1))
 
 # Default database is SQLite (for development use)
 USE_SQLITE=1

@@ -21,7 +21,7 @@ First, follow the **eight (8)** instructions on the [Amazon EC2 Container Servic
 Then do these steps:
 ```bash
 docker rm -f site-web # this is fine if this fails
-docker run -d -p 80:80 --name site-web --env WEB_ADMIN_PASSWORD=...make...up...a...password personal/site-web -t "^$(curl -s http://169.254.169.254/latest/meta-data/public-hostname)$"
+docker run -d -p 80:80 --name site-web --env WEB_ADMIN_PASSWORD=...make...up...a...password personal/site-web --trust-this-ec2-host
 docker logs --follow site-web
 ```
 
