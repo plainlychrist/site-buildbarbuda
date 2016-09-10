@@ -7,6 +7,7 @@ usage()
   echo "Options: " >&2
     echo "-h                              Display this help" >&2
     echo "-t|--trust-host-pattern REGEX   Add a trusted host pattern, as per https://www.drupal.org/node/1992030. Can be repeated" >&2
+    echo "--trust-this-host               Add the result of running 'hostname' as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
     echo "--trust-this-ec2-host           Add the public DNS name of this EC2 host as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
     echo "-m|--use-mysql                  Use MySQL. Expects MYSQL_DATABASE, MYSQL_USER and MYSQL_PASSWORD environment variables, with 'db' as the hostname" >&2
 }
@@ -27,6 +28,10 @@ while [[ $# -gt 0 ]]; do
     -t|--trust-host-pattern)
       TRUSTED_HOST_PATTERNS+=( $2 )
       shift 2
+      ;;
+    --trust-this-host)
+      TRUSTED_HOST_PATTERNS+=( "^$(hostname)$" )
+      shift
       ;;
     --trust-this-ec2-host)
       PUBLIC_HOSTNAME="^$(curl -s http://169.254.169.254/latest/meta-data/public-hostname)$"
