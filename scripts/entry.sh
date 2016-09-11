@@ -9,7 +9,7 @@ usage()
     echo "-t|--trust-host-pattern REGEX   Add a trusted host pattern, as per https://www.drupal.org/node/1992030. Can be repeated" >&2
     echo "--trust-this-host               Add the result of running 'hostname' as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
     echo "--trust-this-ec2-host           Add the public DNS name of this EC2 host as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
-    echo "-m|--use-mysql                  Use MySQL. Expects MYSQL_DATABASE, MYSQL_USER and MYSQL_PASSWORD environment variables, with 'db' as the hostname" >&2
+    echo "-m|--use-mysql                  Use MySQL. Expects the MYSQL_PASSWORD environment variable to be set. MYSQL_DATABASE, MYSQL_USER, MYSQL_HOST and MYSQL_PORT are optional, and default to 'drupal', 'drupal', 'db' and '3306', respectively, for convenience with Docker links" >&2
 }
 
 # process command line
@@ -52,14 +52,20 @@ SQLITE_LOCATION=${SQLITE_DIR}/.ht.sqlite
 DB_URL=sqlite://${SQLITE_LOCATION}
 
 if [[ $USE_MYSQL -eq 1 ]]; then
-  DB_URL=mysql://${MYSQL_USER}:"${MYSQL_PASSWORD}"@db:3306/${MYSQL_DATABASE}
+  # supply defaults
+  MYSQL_DATABASE=${MYSQL_DATABASE:-drupal}
+  MYSQL_HOST=${MYSQL_HOST:-db}
+  MYSQL_PORT=${MYSQL_PORT:-3306}
+  MYSQL_USER=${MYSQL_USER:-drupal}
+  DB_URL="mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}"
+  echo   "mysql://${MYSQL_USER}:.................@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}"
   USE_SQLITE=0
 
   echo Waiting for at most 30 seconds for MySQL to come alive ...
   php -r "
   for (\$i = 1; \$i <= 30; \$i++) {
     try {
-        \$dbh = new PDO('mysql:host=db;port=3306;dbname=${MYSQL_DATABASE}', '${MYSQL_USER}', '${MYSQL_PASSWORD}', array( PDO::ATTR_PERSISTENT => false));
+        \$dbh = new PDO('mysql:host=${MYSQL_HOST};port=${MYSQL_PORT};dbname=${MYSQL_DATABASE}', '${MYSQL_USER}', '${MYSQL_PASSWORD}', array( PDO::ATTR_PERSISTENT => false));
         if (\$dbh->query('SELECT 1')) { echo \"Connected to MySQL\n\"; exit; }
     } catch (PDOException \$e) {
         echo 'WARN: Retrying connection to MySQL: ', \$e->getMessage(), \"\n\";
