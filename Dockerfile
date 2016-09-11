@@ -1,4 +1,5 @@
 # Writing Guidelines: https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/
+# vim: set tabstop=4 shiftwidth=4 expandtab :
 
 FROM drupal:latest
 
@@ -14,6 +15,7 @@ ENV SYMFONY_FORM_VERSION 3.1
 ENV DRUPAL_NAME_VERSION 8.1
 ENV DRUPAL_ADDRESS_VERSION 8.1
 ENV DRUPAL_WORKBENCH_MODERATION_VERSION 8.1
+ENV DRUPAL_BACKUP_DB_VERSION 8.1
 # This, as of 9/8/2016, is a dev dependency (https://packagist.drupal-composer.org/packages/drupal/security_review#dev-8.x-1.x), which needs 'git clone'
 ENV DRUPAL_SECURITY_REVIEW_VERSION 8.1
 
@@ -23,9 +25,9 @@ ENV DRUPAL_SECURITY_REVIEW_VERSION 8.1
 #   mysql-client or sqlite3
 # Install git so that Composer, when fetching dev dependencies, can do a 'git clone'
 RUN apt-get -y update && \
-  apt-get -y install git && \
-  apt-get -y install mysql-client && \
-  apt-get -y install sqlite3
+        apt-get -y install git && \
+        apt-get -y install mysql-client && \
+        apt-get -y install sqlite3
 
 ############## Apache
 
@@ -34,7 +36,7 @@ RUN apt-get -y update && \
 # let us access the site.
 # Doing this trick in Apache comes from http://askubuntu.com/questions/329323/problem-with-restarting-apache2
 RUN echo 'ServerName localhost' > /etc/apache2/conf-available/ServerName.conf && \
-    a2enconf ServerName
+        a2enconf ServerName
 
 ############# PHP extensions
 
@@ -45,7 +47,7 @@ RUN docker-php-ext-install bcmath
 
 # Install Composer with the phar file.
 RUN curl -fsSL "https://getcomposer.org/installer" | php -- --install-dir=/usr/local/bin --filename=composer && \
-  chmod +x /usr/local/bin/composer
+        chmod +x /usr/local/bin/composer
 
 # Choose where to install packages from
 RUN composer config repositories.drupal composer https://packagist.drupal-composer.org
@@ -76,7 +78,7 @@ RUN drush core-status
 # config_installer: Because of bug https://www.drupal.org/node/1613424, we need this custom install profile
 RUN drush dl config_installer
 RUN composer require "drupal/video_embed_field ~${VIDEO_EMBED_FIELD_VERSION}" && \
-    composer require "drupal/drupal8_zymphonies_theme ~${DRUPAL8_ZYMPHONIES_THEME_VERSION}"
+        composer require "drupal/drupal8_zymphonies_theme ~${DRUPAL8_ZYMPHONIES_THEME_VERSION}"
 
 # Install symfony/intl: commerceguys/addressing suggests installing symfony/intl (to use it as the source of country data)
 # Install symfony/form: commerceguys/addressing suggests installing symfony/form (to generate Symfony address forms)
@@ -89,6 +91,9 @@ RUN composer require "drupal/workbench_moderation ~${DRUPAL_WORKBENCH_MODERATION
 
 # Install security review
 RUN composer require "drupal/security_review ~${DRUPAL_SECURITY_REVIEW_VERSION}"
+
+# Install Backup and Migrate
+RUN composer require "drupal/backup_db ~${DRUPAL_BACKUP_DB_VERSION}"
 
 # Development (https://www.drupal.org/project/devel) ... SHOULD NOT BE INSTALLED IN PRODUCTION ... use entry.sh to install
 ##RUN drush dl devel
@@ -104,10 +109,10 @@ RUN chown -R www-data:www-data /var/lib/site/config/sites/default/
 # Clean up space and unneeded packages
 ##########
 
-RUN apt-get autoremove && apt-get clean
-RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-RUN composer clear-cache
+RUN composer clear-cache && \
+        apt-get autoremove && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Installation
 ############

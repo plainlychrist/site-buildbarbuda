@@ -97,6 +97,11 @@ if drush core-status drupal-settings-file | grep MISSING; then
     echo ');' >> ${SETTINGS}
   fi
 
+  # private files. https://www.drupal.org/documentation/modules/file
+  echo "\$settings['file_private_path'] = '/var/www/private';" >> ${SETTINGS}
+  install -d /var/www/private
+  chown www-data /var/www/private
+
   # Use file-based configuration rather than database-base configuration
   # https://www.drupal.org/node/2291587
 
@@ -167,6 +172,9 @@ if drush core-status drupal-settings-file | grep MISSING; then
 
   echo Enabling the Update Manager module ...
   drush -y pm-enable update
+
+  echo Enabling the Backup Database module ...
+  drush -y pm-enable backup_db
 
   echo Securing POSIX permissions ...
   # https://www.drupal.org/node/244924
