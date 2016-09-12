@@ -2,7 +2,7 @@
 # vim: set tabstop=2 shiftwidth=2 expandtab smartindent:
 set -euo pipefail
 
-usage()
+function usage()
 {
   echo "Options: " >&2
     echo "-h                              Display this help" >&2
@@ -10,6 +10,11 @@ usage()
     echo "--trust-this-host               Add the result of running 'hostname' as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
     echo "--trust-this-ec2-host           Add the public DNS name of this EC2 host as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
     echo "-m|--use-mysql                  Use MySQL. Expects the MYSQL_PASSWORD environment variable to be set. MYSQL_DATABASE, MYSQL_USER, MYSQL_HOST and MYSQL_PORT are optional, and default to 'drupal', 'drupal', 'db' and '3306', respectively, for convenience with Docker links" >&2
+}
+
+function drush()
+{
+  runuser -u drupaladmin -- /home/drupaladmin/bin/drush "$@"
 }
 
 # process command line
@@ -74,11 +79,13 @@ if [[ $USE_MYSQL -eq 1 ]]; then
   }
   echo \"FATAL: Could not connect to MySQL\n\";
   "
+
+elif [[ $USE_SQLITE -eq 1 ]]; then
+  install -o drupaladmin -g www-data -m 770 -d ${SQLITE_DIR}
 fi
 
 # Install drupal, specifically sites/default/settings.php
 if drush core-status drupal-settings-file | grep MISSING; then
-
   echo Installing a starter site with Drush site-install, with email notification disabled ...
 
   echo Generating the global Drupal settings ...
@@ -99,8 +106,6 @@ if drush core-status drupal-settings-file | grep MISSING; then
 
   # private files. https://www.drupal.org/documentation/modules/file
   echo "\$settings['file_private_path'] = '/var/www/private';" >> ${SETTINGS}
-  install -d /var/www/private
-  chown www-data /var/www/private
 
   # Use file-based configuration rather than database-base configuration
   # https://www.drupal.org/node/2291587
@@ -110,8 +115,8 @@ if drush core-status drupal-settings-file | grep MISSING; then
   if [[ ! -e ${STORAGE_CONFIG}/active/system.site.yml ]]; then # there is no Docker mount to a 'git' workspace
     HAVE_STORED_CONFIG=0
     install -d ${STORAGE_CONFIG}
-    install -d ${STORAGE_CONFIG}/staging # configs for manual import should never be modified by the running Drupal system
-    install -o www-data -m 755 -d ${STORAGE_CONFIG}/active ${STORAGE_CONFIG}/sync
+    install -o drupaladmin -d ${STORAGE_CONFIG}/staging # configs for manual import should never be modified by the running Drupal system
+    install -o drupaladmin -g www-data -m 775 -d ${STORAGE_CONFIG}/active ${STORAGE_CONFIG}/sync
   fi
   echo >> ${SETTINGS}
   echo '# Installed by site-web entry.sh' >> ${SETTINGS}
@@ -142,6 +147,7 @@ if drush core-status drupal-settings-file | grep MISSING; then
     drush -y site-install --db-url="${DB_URL}" \
       --account-name=admin \
       --account-pass="${WEB_ADMIN_PASSWORD}" \
+      --verbose \
       config_installer install_configure_form.update_status_module='array(FALSE,FALSE)'
 
   else
@@ -153,13 +159,14 @@ if drush core-status drupal-settings-file | grep MISSING; then
       --account-mail=no-reply@plainlychrist.org \
       --site-name="PlainlyChrist.org" \
       --site-mail=no-reply@plainlychrist.org \
+      --verbose \
       standard install_configure_form.update_status_module='array(FALSE,FALSE)'
   fi
 
   if [[ $USE_SQLITE -eq 1 ]]; then
     # Fix permissions as per https://api.drupal.org/api/drupal/core!INSTALL.sqlite.txt/8.1.x
-    chown www-data "${SQLITE_DIR}" "${SQLITE_LOCATION}"
-    chmod 600 "${SQLITE_LOCATION}"
+    chown drupaladmin:www-data "${SQLITE_DIR}" "${SQLITE_LOCATION}"
+    chmod 660 "${SQLITE_LOCATION}"
   fi
 
   # Enable the modules that must be present, regardless of configuration.
@@ -176,13 +183,15 @@ if drush core-status drupal-settings-file | grep MISSING; then
   echo Enabling the Backup Database module ...
   drush -y pm-enable backup_db
 
-  echo Securing POSIX permissions ...
+  echo Securing POSIX permissions for web account ...
   # https://www.drupal.org/node/244924
   find /var/www/html -type f -exec chmod a-w {} \;
   find /var/www/html -type d -exec chmod a-w {} \;
-  chown -R www-data /var/www/html/sites/default/files
-  find /var/www/html/sites/default/files -type d -exec chmod u+w {} \;
-  chown -R www-data /var/lib/site/storage-config/active /var/lib/site/storage-config/sync
+  install -o drupaladmin -g www-data -m 755 -d /var/www/html/modules 
+  chown -R drupaladmin:www-data /var/www/html/sites/default/files /var/lib/site/storage-config/active /var/lib/site/storage-config/sync
+  find /var/www/html/sites/default/files -type d -exec chmod 770 {} \;
+  find /var/lib/site/storage-config/active -type d -exec chmod 770 {} \;
+  find /var/lib/site/storage-config/sync -type d -exec chmod 770 {} \;
 fi
 
 # Then run CMD (apache2-foreground) from php:apache in https://hub.docker.com/_/php/
