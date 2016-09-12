@@ -28,11 +28,13 @@ ENV DRUPAL_SECURITY_REVIEW_VERSION 8.1
 # Install a database client, which is used by 'drush up' and 'drush sql-dump'
 #   mysql-client or sqlite3
 # Install git so that Composer, when fetching dev dependencies, can do a 'git clone'
+# Install supervisor so we can run multiple processes in one container
 RUN apt-get -y update
 RUN apt-get -y install \
         git \
         mysql-client \
-        sqlite3
+        sqlite3 \
+        supervisor
 
 ############## Apache
 
@@ -160,6 +162,9 @@ RUN apt-get autoremove && \
 COPY config/sites/default/ /var/lib/site/config/sites/default
 RUN chown -R www-data:www-data /var/lib/site/config/sites/default/
 
+# Supervisor daemon to run multiple processes
+COPY filesystem/etc/ /etc/
+
 # Installation
 ############
 
@@ -167,6 +172,5 @@ COPY scripts/entry.sh /var/lib/site/bin/entry.sh
 RUN chmod 500 /var/lib/site/bin/entry.sh && \
   install -o drupaladmin -g www-data -m 770 -d /var/www/private && \
   install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default
-
 
 ENTRYPOINT ["/var/lib/site/bin/entry.sh"]

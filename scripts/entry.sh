@@ -194,6 +194,6 @@ if drush core-status drupal-settings-file | grep MISSING; then
   find /var/lib/site/storage-config/sync -type d -exec chmod 770 {} \;
 fi
 
-# Then run CMD (apache2-foreground) from php:apache in https://hub.docker.com/_/php/
-echo Starting the Apache server in foreground ...
-exec apache2-foreground
+# Launch Apache and cron, with a supervisor to manage the two processes
+echo Starting the supervisor in the foreground ...
+exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
