@@ -16,6 +16,8 @@ ENV DRUPAL_NAME_VERSION 8.1
 ENV DRUPAL_ADDRESS_VERSION 8.1
 ENV DRUPAL_WORKBENCH_MODERATION_VERSION 8.1
 ENV DRUPAL_BACKUP_DB_VERSION 8.1
+ENV DRUPAL_FLYSYSTEM_VERSION 8.1
+ENV DRUPAL_FLYSYSTEM_S3_VERSION 8.1
 # This, as of 9/8/2016, is a dev dependency (https://packagist.drupal-composer.org/packages/drupal/security_review#dev-8.x-1.x), which needs 'git clone'
 ENV DRUPAL_SECURITY_REVIEW_VERSION 8.1
 
@@ -103,14 +105,6 @@ RUN ~/bin/drush core-status
 # Modules
 #########
 
-# Install symfony/polyfill-intl-icu suggests installing ext-intl (For best performance), and
-# symfony/intl suggests installing ext-intl (to use the component with locales other than "en")
-# NOTE: Can get this to install, but not important ... http://stackoverflow.com/questions/6727736/cant-get-to-install-intl-extension-for-php-on-debian
-#RUN apt-get install -y php5-intl libicu-dev
-#RUN pecl install intl
-#RUN docker-php-ext-install intl
-
-# Backup (https://www.drupal.org/project/backup_migrate and http://www.nodesquirrel.com/) "drupal/backup_migrate ~8.4"
 # Video embedding (https://www.drupal.org/project/video_embed_field)
 # Themes
 # config_installer: Because of bug https://www.drupal.org/node/1613424, we need this custom install profile
@@ -125,16 +119,15 @@ RUN ~/bin/composer require "symfony/intl ~${SYMFONY_INTL_VERSION}" "symfony/form
     "drupal/name ~${DRUPAL_NAME_VERSION}" "drupal/address ~${DRUPAL_ADDRESS_VERSION}"
 
 # Install workbench moderation
-RUN ~/bin/composer require "drupal/workbench_moderation ~${DRUPAL_WORKBENCH_MODERATION_VERSION}"
-
+# Install flysystem so we can run across multiple machines
 # Install security review
-RUN ~/bin/composer require "drupal/security_review ~${DRUPAL_SECURITY_REVIEW_VERSION}"
-
 # Install Backup and Migrate
-RUN ~/bin/composer require "drupal/backup_db ~${DRUPAL_BACKUP_DB_VERSION}"
-
-# Development (https://www.drupal.org/project/devel) ... SHOULD NOT BE INSTALLED IN PRODUCTION ... use entry.sh to install
-##RUN ~/bin/drush dl devel
+RUN ~/bin/composer require \
+        "drupal/backup_db ~${DRUPAL_BACKUP_DB_VERSION}" \
+        "drupal/flysystem ~${DRUPAL_FLYSYSTEM_VERSION}" \
+        "drupal/flysystem_s3 ~${DRUPAL_FLYSYSTEM_S3_VERSION}" \
+        "drupal/security_review ~${DRUPAL_SECURITY_REVIEW_VERSION}" \
+        "drupal/workbench_moderation ~${DRUPAL_WORKBENCH_MODERATION_VERSION}"
 
 # Clean up drupaladmin
 ##########
@@ -165,12 +158,16 @@ RUN chown -R www-data:www-data /var/lib/site/config/sites/default/
 # Supervisor daemon to run multiple processes
 COPY filesystem/etc/ /etc/
 
+# Snippets used to build the settings.php
+COPY settings/ /var/lib/site/settings
+
 # Installation
 ############
 
 COPY scripts/entry.sh /var/lib/site/bin/entry.sh
 RUN chmod 500 /var/lib/site/bin/entry.sh && \
-  install -o drupaladmin -g www-data -m 770 -d /var/www/private && \
-  install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default
+  install -o drupaladmin -g www-data -m 770 -d /var/www/flysystem && \
+  install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default \
+  install -o drupaladmin -g www-data -m 770 -d /var/www/private
 
 ENTRYPOINT ["/var/lib/site/bin/entry.sh"]

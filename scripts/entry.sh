@@ -105,7 +105,11 @@ if drush core-status drupal-settings-file | grep MISSING; then
   fi
 
   # private files. https://www.drupal.org/documentation/modules/file
+  # They are needed for drupal/backup_db
   echo "\$settings['file_private_path'] = '/var/www/private';" >> ${SETTINGS}
+
+  # flywheel for local + remote file access
+  cat /var/lib/site/settings/flysystem-local.php >> ${SETTINGS}
 
   # Use file-based configuration rather than database-base configuration
   # https://www.drupal.org/node/2291587
@@ -183,16 +187,24 @@ if drush core-status drupal-settings-file | grep MISSING; then
   echo Enabling the Backup Database module ...
   drush -y pm-enable backup_db
 
-  echo Securing POSIX permissions for web account ...
-  # https://www.drupal.org/node/244924
-  find /var/www/html -type f -exec chmod a-w {} \;
-  find /var/www/html -type d -exec chmod a-w {} \;
-  install -o drupaladmin -g www-data -m 755 -d /var/www/html/modules 
-  chown -R drupaladmin:www-data /var/www/html/sites/default/files /var/lib/site/storage-config/active /var/lib/site/storage-config/sync
-  find /var/www/html/sites/default/files -type d -exec chmod 770 {} \;
-  find /var/lib/site/storage-config/active -type d -exec chmod 770 {} \;
-  find /var/lib/site/storage-config/sync -type d -exec chmod 770 {} \;
+  echo Enabling the Flysystem modules ...
+  drush -y pm-enable flysystem flysystem_s3
+
 fi
+
+# https://www.drupal.org/node/244924
+echo Securing POSIX permissions for web account ...
+find /var/www/html -type f -exec chmod a-w {} \;
+find /var/www/html -type d -exec chmod a-w {} \;
+install -o drupaladmin -g www-data -m 755 -d /var/www/html/modules
+chown -R drupaladmin:www-data /var/www/html/sites/default/files /var/lib/site/storage-config/active /var/lib/site/storage-config/sync
+find /var/www/html/sites/default/files -type d -exec chmod 770 {} \;
+find /var/lib/site/storage-config/active -type d -exec chmod 770 {} \;
+find /var/lib/site/storage-config/sync -type d -exec chmod 770 {} \;
+
+# Applying security advisory: https://www.drupal.org/SA-CORE-2013-003
+echo Deny from all > /var/www/flysystem/.htaccess
+echo Deny from all > /var/www/private/.htaccess
 
 # Launch Apache and cron, with a supervisor to manage the two processes
 echo Starting the supervisor in the foreground ...
