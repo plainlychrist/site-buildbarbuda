@@ -158,7 +158,7 @@ RUN chown -R www-data:www-data /var/lib/site/config/sites/default/
 # Supervisor daemon to run multiple processes
 COPY filesystem/etc/ /etc/
 
-# Snippets used to build the settings.php
+# Snippets used to build the settings.php and .htacess
 COPY settings/ /var/lib/site/settings
 
 # Installation
