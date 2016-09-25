@@ -129,6 +129,11 @@ RUN ~/bin/composer require \
         "drupal/security_review ~${DRUPAL_SECURITY_REVIEW_VERSION}" \
         "drupal/workbench_moderation ~${DRUPAL_WORKBENCH_MODERATION_VERSION}"
 
+# Install mysql2sqlite
+ENV MYSQL2SQLITE_VERSION 1b0b5d610c6090422625a2c58d2c23d2296eab3a
+RUN curl "https://raw.githubusercontent.com/dumblob/mysql2sqlite/${MYSQL2SQLITE_VERSION}/mysql2sqlite" > ~/bin/mysql2sqlite && \
+        chmod +x ~/bin/mysql2sqlite
+
 # Clean up drupaladmin
 ##########
 

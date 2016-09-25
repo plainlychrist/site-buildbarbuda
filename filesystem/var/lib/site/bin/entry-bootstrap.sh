@@ -57,6 +57,32 @@ echo '  config.storage.active:' >> ${SERVICES}
 echo '    class: Drupal\Core\Config\FileStorage' >> ${SERVICES}
 echo '    factory: Drupal\Core\Config\FileStorageFactory::getActive' >> ${SERVICES}
 
+function bootstrap {
+  BOOTSTRAP_DIR=/var/lib/site/bootstrap
+  install -d ${BOOTSTRAP_DIR}
+  curl -v "${BOOTSTRAP_URL}/sites/default/files/public-backups/latest.txt" > ${BOOTSTRAP_DIR}/latest.txt
+  BOOTSTRAP_LATEST=$(< ${BOOTSTRAP_DIR}/latest.txt)
+  curl -v "${BOOTSTRAP_URL}/sites/default/files/public-backups/${BOOTSTRAP_LATEST}.plain-dump.sql.txt" > ${BOOTSTRAP_DIR}/plain-dump.sql.txt
+  curl -v "${BOOTSTRAP_URL}/sites/default/files/public-backups/${BOOTSTRAP_LATEST}.sanitized-dump.sql.txt" > ${BOOTSTRAP_DIR}/sanitized-dump.sql.txt
+  curl -v "${BOOTSTRAP_URL}/sites/default/files/public-backups/${BOOTSTRAP_LATEST}.sanitized-restore.sql.txt" > ${BOOTSTRAP_DIR}/sanitized-restore.sql.txt
+  
+  if [[ $USE_SQLITE -eq 1 ]]; then
+    ~drupaladmin/bin/mysql2sqlite ${BOOTSTRAP_DIR}/plain-dump.sql.txt > ${BOOTSTRAP_DIR}/plain-dump.sql
+    ~drupaladmin/bin/mysql2sqlite ${BOOTSTRAP_DIR}/sanitized-dump.sql.txt > ${BOOTSTRAP_DIR}/sanitized-dump.sql
+    install ${BOOTSTRAP_DIR}/sanitized-restore.sql.txt ${BOOTSTRAP_DIR}/sanitized-restore.sql
+  else
+    install ${BOOTSTRAP_DIR}/plain-dump.sql.txt ${BOOTSTRAP_DIR}/plain-dump.sql
+    install ${BOOTSTRAP_DIR}/sanitized-dump.sql.txt ${BOOTSTRAP_DIR}/sanitized-dump.sql
+    install ${BOOTSTRAP_DIR}/sanitized-restore.sql.txt ${BOOTSTRAP_DIR}/sanitized-restore.sql
+  fi
+
+  drush sql-query --db-url="${DB_URL}" < ${BOOTSTRAP_DIR}/plain-dump.sql
+  drush sql-query --db-url="${DB_URL}" < ${BOOTSTRAP_DIR}/sanitized-dump.sql
+  drush sql-query --db-url="${DB_URL}" < ${BOOTSTRAP_DIR}/sanitized-restore.sql
+}
+
+bootstrap
+
 if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
   echo Doing an already-active configuration site installation ...
 

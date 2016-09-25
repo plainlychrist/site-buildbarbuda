@@ -10,6 +10,7 @@ function usage()
     echo "--trust-this-host               Add the result of running 'hostname' as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
     echo "--trust-this-ec2-host           Add the public DNS name of this EC2 host as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
     echo "-m|--use-mysql                  Use MySQL. Expects the MYSQL_PASSWORD environment variable to be set. MYSQL_DATABASE, MYSQL_USER, MYSQL_HOST and MYSQL_PORT are optional, and default to 'drupal', 'drupal', 'db' and '3306', respectively, for convenience with Docker links" >&2
+    echo "-b|--bootstrap WEBSITE_URL      Bootstrap the data from a live website. This will fetch the latest available snapshot of the data, and only a sanitized (the users are stripped of identifying information) version of that data. The WEBSITE_URL can be https://plainlychrist.org; you MUST TRUST the site as the site will have the ability to install arbitrary code on your site. The bootstrapping will only occur if there is no data yet on your site. The live data is from a MySQL database, and is automatically converted to SQLite if you are not using MySQL yourself; that conversion is not perfect, so using MySQL is recommended" >&2
 }
 
 function drush()
@@ -20,6 +21,7 @@ function drush()
 # process command line
 TRUSTED_HOST_PATTERNS=()
 USE_MYSQL=0
+BOOTSTRAP_URL=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -h|--help)
@@ -29,6 +31,10 @@ while [[ $# -gt 0 ]]; do
     -m|--use-mysql)
       USE_MYSQL=1
       shift
+      ;;
+    -b|--bootstrap)
+      BOOTSTRAP_URL="$2"
+      shift 2
       ;;
     -t|--trust-host-pattern)
       TRUSTED_HOST_PATTERNS+=( $2 )

@@ -27,8 +27,8 @@ ${DRUSH} sql-dump --extra="${DUMP_EXTRA}" | /usr/bin/diff --unchanged-line-forma
 set -o pipefail
 
 # Do the backup of the majority of tables
-echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.plain.sql.txt ...
-${DRUSH} sql-dump --extra='--skip-comments' --structure-tables-list=${STRUCTURE_TABLES_LIST} --skip-tables-list=${SKIP_TABLES_LIST} --result-file=${REL_PUBLIC_BACKUPS}/${DT}.plain.sql.txt
+echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt ...
+${DRUSH} sql-dump --extra='--skip-comments' --structure-tables-list=${STRUCTURE_TABLES_LIST} --skip-tables-list=${SKIP_TABLES_LIST} --result-file=${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt
 
 # SECFIX.1: sql-dump --tables-list=xxx, if xxx does not exist, will dump all the tables. So we create uniquely named tables so no race condition attacks
 SANTBL_UFD="san_$(echo $$ $(/bin/hostname) $(/bin/date +%s.%N) | /usr/bin/sha224sum | /usr/bin/awk '{print $1}')"
@@ -52,7 +52,7 @@ ${DRUSH} sql-query "INSERT INTO ${SANTBL_UFD}
     FROM users_field_data"
 
 # Do the backup of sanitized tables
-echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.sanitized.sql.txt ...
+echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-dump.sql.txt ...
 ${DRUSH} sql-dump --extra='--skip-comments' --tables-list=${SANITIZED_TABLES_LIST} --result-file=${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown
 if [ "$(/bin/grep '^CREATE TABLE' ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown | /usr/bin/wc -l)" != "1" ]; then
   # another failsafe in case the SECFIX.1 fails ... we should only have one (1) table!
@@ -60,12 +60,12 @@ if [ "$(/bin/grep '^CREATE TABLE' ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unk
   exit 1
 else
   # The webserver will not serve files with a leading dot "." nor with unknown extensions, which we did on purpose to mitigate SECFIX.1
-  mv ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown ${REL_PUBLIC_BACKUPS}/${DT}.sanitized.sql.txt
+  mv ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-dump.sql.txt
 fi
 
 # Make sure the sanitized tables restore themselves
-echo 'DROP TABLE IF EXISTS `users_field_data`;' >> ${REL_PUBLIC_BACKUPS}/${DT}.sanitized.sql.txt
-echo 'RENAME TABLE `'"${SANTBL_UFD}"'` TO `users_field_data`;' >> ${REL_PUBLIC_BACKUPS}/${DT}.sanitized.sql.txt
+echo 'DROP TABLE IF EXISTS `users_field_data`;' >> ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-restore.sql.txt
+echo 'RENAME TABLE `'"${SANTBL_UFD}"'` TO `users_field_data`;' >> ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-restore.sql.txt
 
 # Cleanup gracefully now that we are done (rather than hope that EXIT trap works)
 cleanup_sanitized
