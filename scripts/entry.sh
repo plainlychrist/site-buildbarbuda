@@ -197,6 +197,7 @@ echo Securing POSIX permissions for web account ...
 find /var/www/html -type f -exec chmod a-w {} \;
 find /var/www/html -type d -exec chmod a-w {} \;
 install -o drupaladmin -g www-data -m 755 -d /var/www/html/modules
+install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default/files/public-backups
 chown -R drupaladmin:www-data /var/www/html/sites/default/files /var/lib/site/storage-config/active /var/lib/site/storage-config/sync
 find /var/www/html/sites/default/files -type d -exec chmod 770 {} \;
 find /var/lib/site/storage-config/active -type d -exec chmod 770 {} \;

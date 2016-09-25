@@ -164,6 +164,7 @@ COPY settings/ /var/lib/site/settings
 # Installation
 ############
 
+COPY filesystem/var/lib/site/ /var/lib/site/
 COPY scripts/entry.sh /var/lib/site/bin/entry.sh
 RUN chmod 500 /var/lib/site/bin/entry.sh && \
   install -o drupaladmin -g www-data -m 770 -d /var/www/flysystem && \
