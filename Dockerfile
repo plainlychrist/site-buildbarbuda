@@ -165,10 +165,9 @@ COPY settings/ /var/lib/site/settings
 ############
 
 COPY filesystem/var/lib/site/ /var/lib/site/
-COPY scripts/entry.sh /var/lib/site/bin/entry.sh
-RUN chmod 500 /var/lib/site/bin/entry.sh && \
+RUN chmod 500 /var/lib/site/bin/*.sh && \
   install -o drupaladmin -g www-data -m 770 -d /var/www/flysystem && \
-  install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default \
+  install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default && \
   install -o drupaladmin -g www-data -m 770 -d /var/www/private
 
 ENTRYPOINT ["/var/lib/site/bin/entry.sh"]
