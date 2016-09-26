@@ -1,0 +1,12 @@
+uuid: 8a95b8d0-04a8-4956-b26e-2bea5f5e2d43
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: c4zaT5cyPxuTXI6JOWt3qRtMvICT9tHB6d9a5VG-CmQ
+id: feedback
+label: 'Website feedback'
+recipients:
+  - no-reply@plainlychrist.org
+reply: ''
+weight: 0

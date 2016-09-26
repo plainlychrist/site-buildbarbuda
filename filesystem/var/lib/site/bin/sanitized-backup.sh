@@ -65,7 +65,7 @@ fi
 
 # Make sure the sanitized tables restore themselves
 echo 'DROP TABLE IF EXISTS `users_field_data`;' >> ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-restore.sql.txt
-echo 'RENAME TABLE `'"${SANTBL_UFD}"'` TO `users_field_data`;' >> ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-restore.sql.txt
+echo 'ALTER TABLE `'"${SANTBL_UFD}"'` RENAME TO `users_field_data`;' >> ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-restore.sql.txt
 
 # Cleanup gracefully now that we are done (rather than hope that EXIT trap works)
 cleanup_sanitized

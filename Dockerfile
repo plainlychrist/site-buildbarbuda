@@ -8,6 +8,7 @@ MAINTAINER Jonah.Beckford@plainlychrist.org
 ############# Versions
 
 ENV DRUSH_MAJOR_VERSION 8
+ENV DRUSH_CONFIG_EXTRA_FULL_VERSION 8.0.x-dev
 ENV VIDEO_EMBED_FIELD_VERSION 8.1
 ENV DRUPAL8_ZYMPHONIES_THEME_VERSION 8.1
 ENV SYMFONY_INTL_VERSION 3.1
@@ -18,6 +19,7 @@ ENV DRUPAL_WORKBENCH_MODERATION_VERSION 8.1
 ENV DRUPAL_BACKUP_DB_VERSION 8.1
 ENV DRUPAL_FLYSYSTEM_VERSION 8.1
 ENV DRUPAL_FLYSYSTEM_S3_VERSION 8.1
+ENV MYSQL2SQLITE_VERSION 1b0b5d610c6090422625a2c58d2c23d2296eab3a
 # This, as of 9/8/2016, is a dev dependency (https://packagist.drupal-composer.org/packages/drupal/security_review#dev-8.x-1.x), which needs 'git clone'
 ENV DRUPAL_SECURITY_REVIEW_VERSION 8.1
 
@@ -93,7 +95,6 @@ RUN \
 ############# Drush
 
 # Install Drush with Composer: http://www.whaaat.com/installing-drush-8-using-composer
-ENV DRUSH_CONFIG_EXTRA_FULL_VERSION 8.0.x-dev
 RUN ~/bin/composer global require \
         drush/drush:${DRUSH_MAJOR_VERSION}.* \
         drush/config-extra:${DRUSH_CONFIG_EXTRA_FULL_VERSION}
@@ -130,7 +131,6 @@ RUN ~/bin/composer require \
         "drupal/workbench_moderation ~${DRUPAL_WORKBENCH_MODERATION_VERSION}"
 
 # Install mysql2sqlite
-ENV MYSQL2SQLITE_VERSION 1b0b5d610c6090422625a2c58d2c23d2296eab3a
 RUN curl "https://raw.githubusercontent.com/dumblob/mysql2sqlite/${MYSQL2SQLITE_VERSION}/mysql2sqlite" > ~/bin/mysql2sqlite && \
         chmod +x ~/bin/mysql2sqlite
 
@@ -173,6 +173,7 @@ COPY filesystem/var/lib/site/ /var/lib/site/
 RUN chmod 500 /var/lib/site/bin/*.sh && \
   install -o drupaladmin -g www-data -m 770 -d /var/www/flysystem && \
   install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default && \
-  install -o drupaladmin -g www-data -m 770 -d /var/www/private
+  install -o drupaladmin -g www-data -m 770 -d /var/www/private && \
+  chown -R drupaladmin:www-data /var/lib/site/storage-config/active
 
 ENTRYPOINT ["/var/lib/site/bin/entry.sh"]

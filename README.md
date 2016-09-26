@@ -32,5 +32,5 @@ Similar instructions as `Linux on Amazon EC2`, and replace the `run` line with t
 ```bash
 git clone https://github.com/plainlychrist/site-web.git # skip this if you already have the source code
 cd site-web
-docker run -d -p 80:80 --name site-web -v $PWD/storage-config:/var/lib/site/storage-config --env WEB_ADMIN_PASSWORD=...make...up...a...password personal/site-web
+docker run -d -p 80:80 --name site-web -v $PWD/filesystem/var/lib/site/storage-config:/var/lib/site/storage-config --env WEB_ADMIN_PASSWORD=...make...up...a...password personal/site-web
 ```
