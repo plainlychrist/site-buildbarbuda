@@ -27,8 +27,9 @@ ${DRUSH} sql-dump --extra="${DUMP_EXTRA}" | /usr/bin/diff --unchanged-line-forma
 set -o pipefail
 
 # Do the backup of the majority of tables
-echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt ...
+echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt.gz ...
 ${DRUSH} sql-dump --extra='--skip-comments' --structure-tables-list=${STRUCTURE_TABLES_LIST} --skip-tables-list=${SKIP_TABLES_LIST} --result-file=${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt
+gzip ${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt
 
 # SECFIX.1: sql-dump --tables-list=xxx, if xxx does not exist, will dump all the tables. So we create uniquely named tables so no race condition attacks
 SANTBL_UFD="san_$(echo $$ $(/bin/hostname) $(/bin/date +%s.%N) | /usr/bin/sha224sum | /usr/bin/awk '{print $1}')"
@@ -52,7 +53,7 @@ ${DRUSH} sql-query "INSERT INTO ${SANTBL_UFD}
     FROM users_field_data"
 
 # Do the backup of sanitized tables
-echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-dump.sql.txt ...
+echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-dump.sql.txt.gz ...
 ${DRUSH} sql-dump --extra='--skip-comments' --tables-list=${SANITIZED_TABLES_LIST} --result-file=${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown
 if [ "$(/bin/grep '^CREATE TABLE' ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown | /usr/bin/wc -l)" != "1" ]; then
   # another failsafe in case the SECFIX.1 fails ... we should only have one (1) table!
@@ -60,17 +61,39 @@ if [ "$(/bin/grep '^CREATE TABLE' ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unk
   exit 1
 else
   # The webserver will not serve files with a leading dot "." nor with unknown extensions, which we did on purpose to mitigate SECFIX.1
-  mv ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-dump.sql.txt
+  gzip -c ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown > ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-dump.sql.txt.gz
+  rm -f ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown
 fi
 
 # Make sure the sanitized tables restore themselves
-echo 'DROP TABLE IF EXISTS `users_field_data`;' >> ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-restore.sql.txt
+echo 'DROP TABLE IF EXISTS `users_field_data`;' > ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-restore.sql.txt
 echo 'ALTER TABLE `'"${SANTBL_UFD}"'` RENAME TO `users_field_data`;' >> ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-restore.sql.txt
+gzip ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-restore.sql.txt
 
 # Cleanup gracefully now that we are done (rather than hope that EXIT trap works)
 cleanup_sanitized
 
+# Make a backup of all the files
+# - Don't need the js_ and css_ aggregations (https://www.keycdn.com/blog/speed-up-drupal/#css)
+# - Don't need the php twig precompilations (https://www.drupal.org/docs/8/theming/twig/debugging-compiled-twig-templates)
+# - Don't need to backup the backups
+# - Don't need the .htaccess, which will be ignored anyway during restoration
+echo Creating tar backup of files at ${REL_PUBLIC_BACKUPS}/${DT}.sites-default-files.tar.xz ...
+/bin/tar --create --preserve-permissions --xz --directory /var/www/html --file ${REL_PUBLIC_BACKUPS}/${DT}.sites-default-files.tar.xz \
+    --exclude="sites/default/files/js/js_*" \
+    --exclude="sites/default/files/css/css_*" \
+    --exclude="sites/default/files/php/twig/*" \
+    --exclude="sites/default/files/public-backups/*" \
+    --exclude ".htaccess" \
+    sites/default/files
+
 # Update the reference atomically
 echo ${DT} > ${REL_PUBLIC_BACKUPS}/latest.txt.tmp
-mv ${REL_PUBLIC_BACKUPS}/latest.txt.tmp ${REL_PUBLIC_BACKUPS}/latest.txt
+mv -f ${REL_PUBLIC_BACKUPS}/latest.txt.tmp ${REL_PUBLIC_BACKUPS}/latest.txt
 echo Updated ${REL_PUBLIC_BACKUPS}/latest.txt. Done
+
+# Remove older backups than 15 days ago
+echo Removing much older backups ...
+find /var/www/html/sites/default/files/public-backups -type f -mtime +15 -exec rm -vf {} +
+
+echo Done

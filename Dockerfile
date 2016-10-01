@@ -171,6 +171,7 @@ COPY settings/ /var/lib/site/settings
 
 COPY filesystem/var/lib/site/ /var/lib/site/
 RUN chmod 500 /var/lib/site/bin/*.sh && \
+  chown www-data /var/lib/site/bin/sanitized-backup.sh && \
   install -o drupaladmin -g www-data -m 770 -d /var/www/flysystem && \
   install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default && \
   install -o drupaladmin -g www-data -m 770 -d /var/www/private && \
