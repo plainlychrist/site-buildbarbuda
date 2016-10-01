@@ -20,6 +20,7 @@ function restore_data {
   curl --include --progress-bar "${RESTORE_URL}/${BOOTSTRAP_LATEST}.sanitized-dump.sql.txt.gz" | gunzip -c > ${BOOTSTRAP_DIR}/sanitized-dump.sql.txt
   curl --include --progress-bar "${RESTORE_URL}/${BOOTSTRAP_LATEST}.sanitized-restore.sql.txt.gz" | gunzip -c > ${BOOTSTRAP_DIR}/sanitized-restore.sql.txt
   curl --include --progress-bar "${RESTORE_URL}/${BOOTSTRAP_LATEST}.sites-default-files.tar.xz" > ${BOOTSTRAP_DIR}/sites-default-files.tar.xz
+  curl --include --progress-bar "${RESTORE_URL}/${BOOTSTRAP_LATEST}.flysystem-main.tar.xz" > ${BOOTSTRAP_DIR}/flysystem-main.tar.xz
 
   # Copy or convert the downloaded file to *.sql
   if [[ $USE_SQLITE -eq 1 ]]; then
@@ -44,11 +45,14 @@ function restore_data {
   $(drush sql-connect --db-url="${DB_URL}") < ${BOOTSTRAP_DIR}/sanitized-restore.sql
 
   # Restore any files to sites/default/files
-  tar --extract --xz --directory /var/www/html \
+  tar --extract --xz --directory /var/www/html/sites/default/files \
     --exclude "*.php" \
     --exclude ".htaccess" \
-    --file ${BOOTSTRAP_DIR}/sites-default-files.tar.xz \
-    sites/default/files/
+    --file ${BOOTSTRAP_DIR}/sites-default-files.tar.xz
+  tar --extract --xz --directory /var/www/flysystem \
+    --exclude "*.php" \
+    --exclude ".htaccess" \
+    --file ${BOOTSTRAP_DIR}/flysystem-main.tar.xz
 }
 
 SALT_FILE=/var/lib/site/salt.txt

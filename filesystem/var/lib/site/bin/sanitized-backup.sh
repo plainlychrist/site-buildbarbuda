@@ -78,14 +78,20 @@ cleanup_sanitized
 # - Don't need the php twig precompilations (https://www.drupal.org/docs/8/theming/twig/debugging-compiled-twig-templates)
 # - Don't need to backup the backups
 # - Don't need the .htaccess, which will be ignored anyway during restoration
-echo Creating tar backup of files at ${REL_PUBLIC_BACKUPS}/${DT}.sites-default-files.tar.xz ...
-/bin/tar --create --preserve-permissions --xz --directory /var/www/html --file ${REL_PUBLIC_BACKUPS}/${DT}.sites-default-files.tar.xz \
-    --exclude="sites/default/files/js/js_*" \
-    --exclude="sites/default/files/css/css_*" \
-    --exclude="sites/default/files/php/twig/*" \
-    --exclude="sites/default/files/public-backups/*" \
+
+echo Creating tar backup of public files at ${REL_PUBLIC_BACKUPS}/${DT}.sites-default-files.tar.xz ...
+/bin/tar --create --xz --directory /var/www/html/sites/default/files --file ${REL_PUBLIC_BACKUPS}/${DT}.sites-default-files.tar.xz \
+    --exclude="./js/js_*" \
+    --exclude="./css/css_*" \
+    --exclude="./php/twig/*" \
+    --exclude="./public-backups/*" \
     --exclude ".htaccess" \
-    sites/default/files
+    .
+
+echo Creating tar backup of flysystem files at ${REL_PUBLIC_BACKUPS}/${DT}.flysystem-main.tar.xz ...
+/bin/tar --create --xz --directory /var/www/flysystem --file ${REL_PUBLIC_BACKUPS}/${DT}.flysystem-main.tar.xz \
+    --exclude ".htaccess" \
+    .
 
 # Update the reference atomically
 echo ${DT} > ${REL_PUBLIC_BACKUPS}/latest.txt.tmp
