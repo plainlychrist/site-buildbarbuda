@@ -104,6 +104,7 @@ install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default/files/p
 chown -R drupaladmin:www-data /var/www/html/sites/default/files /var/lib/site/storage-config/active /var/lib/site/storage-config/sync
 find /var/www/html/sites/default/files -type d -exec chmod 770 {} \;
 find /var/lib/site/storage-config/active -type d -exec chmod 770 {} \;
+find /var/lib/site/storage-config/active -type f -exec chmod 664 {} \;
 find /var/lib/site/storage-config/sync -type d -exec chmod 770 {} \;
 
 # Applying security advisory: https://www.drupal.org/SA-CORE-2013-003
