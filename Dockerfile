@@ -32,22 +32,32 @@ ENV DRUPAL_SECURITY_REVIEW_VERSION 8.1
 # Install a database client, which is used by 'drush up' and 'drush sql-dump'
 #   mysql-client or sqlite3
 # Install git so that Composer, when fetching dev dependencies, can do a 'git clone'
+# Install self-signed SSL (auto-generated) for Apache HTTPS
 # Install supervisor so we can run multiple processes in one container
 RUN apt-get -y update
 RUN apt-get -y install \
         git \
         mysql-client \
         sqlite3 \
+        ssl-cert openssl-blacklist \
         supervisor
 
 ############## Apache
 
-# Rarely does someone's machine have a `hostname` that has a reverse DNS-able entry in /etc/hosts.
-# so we force the ServerName to be localhost, and use 'docker run .... -p 8080:80' networking to
-# let us access the site.
-# Doing this trick in Apache comes from http://askubuntu.com/questions/329323/problem-with-restarting-apache2
+# ServerName:
+#   Rarely does someone's machine have a `hostname` that has a reverse DNS-able entry in /etc/hosts.
+#   so we force the ServerName to be localhost, and use 'docker run .... -p 8080:80' networking to
+#   let us access the site.
+#   Doing this trick in Apache comes from http://askubuntu.com/questions/329323/problem-with-restarting-apache2
+# ssl: We want HTTPS to be enabled
+# default-ssl: Make a post 443 site, the same as port 80 site, using self-signed certificate (from ssl-cert)
 RUN echo 'ServerName localhost' > /etc/apache2/conf-available/ServerName.conf && \
-        a2enconf ServerName
+        a2enconf ServerName && \
+        a2enmod ssl && \
+        a2ensite default-ssl
+
+# Since we have SSL, enable only port 443 (you can expose port 80 on the command line, or with Docker Compose, if you have a properly-configured SSL proxy)
+EXPOSE 443
 
 ############# PHP extensions
 
