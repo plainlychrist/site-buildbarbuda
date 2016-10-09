@@ -1,7 +1,7 @@
 # Writing Guidelines: https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/
 # vim: set tabstop=4 shiftwidth=4 expandtab :
 
-FROM drupal:latest
+FROM drupal:8.2
 
 MAINTAINER Jonah.Beckford@plainlychrist.org
 
@@ -42,19 +42,20 @@ RUN apt-get -y install \
         ssl-cert openssl-blacklist \
         supervisor
 
+############## Our customizations
+
+COPY filesystem/etc/ /etc/
+
 ############## Apache
 
-# ServerName:
-#   Rarely does someone's machine have a `hostname` that has a reverse DNS-able entry in /etc/hosts.
-#   so we force the ServerName to be localhost, and use 'docker run .... -p 8080:80' networking to
-#   let us access the site.
-#   Doing this trick in Apache comes from http://askubuntu.com/questions/329323/problem-with-restarting-apache2
 # ssl: We want HTTPS to be enabled
-# default-ssl: Make a post 443 site, the same as port 80 site, using self-signed certificate (from ssl-cert)
-RUN echo 'ServerName localhost' > /etc/apache2/conf-available/ServerName.conf && \
-        a2enconf ServerName && \
-        a2enmod ssl && \
-        a2ensite default-ssl
+# headers: We want to customize the HTTP headers
+# site-web: (filesystem)/etc/apache2/sites-available/site-web.conf
+# 000-default: Disable the HTTP 80 site
+RUN     a2enmod ssl && \
+        a2enmod headers && \
+        a2ensite site-web && \
+        a2dissite 000-default
 
 # Since we have SSL, enable only port 443 (you can expose port 80 on the command line, or with Docker Compose, if you have a properly-configured SSL proxy)
 EXPOSE 443
@@ -169,9 +170,6 @@ RUN apt-get autoremove && \
 
 COPY config/sites/default/ /var/lib/site/config/sites/default
 RUN chown -R www-data:www-data /var/lib/site/config/sites/default/
-
-# Supervisor daemon to run multiple processes
-COPY filesystem/etc/ /etc/
 
 # Snippets used to build the settings.php and .htacess
 COPY settings/ /var/lib/site/settings
