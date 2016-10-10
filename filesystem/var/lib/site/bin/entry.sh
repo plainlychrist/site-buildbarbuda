@@ -9,6 +9,7 @@ function usage()
     echo "-t|--trust-host-pattern REGEX   Add a trusted host pattern, as per https://www.drupal.org/node/1992030. Can be repeated" >&2
     echo "--trust-this-host               Add the result of running 'hostname' as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
     echo "--trust-this-ec2-host           Add the public DNS name of this EC2 host as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
+    echo "--trust-this-ec2-local-ipv4     Add the local IP4 address of this EC2 host, used by AWS ELB for health checks, as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
     echo "-m|--use-mysql                  Use MySQL. Expects the MYSQL_PASSWORD environment variable to be set. MYSQL_DATABASE, MYSQL_USER, MYSQL_HOST and MYSQL_PORT are optional, and default to 'drupal', 'drupal', 'db' and '3306', respectively, for convenience with Docker links" >&2
     echo "-b|--bootstrap WEBSITE_URL      Bootstrap the data from a live website. This will fetch the latest available snapshot of the data, and only a sanitized (the users are stripped of identifying information) version of that data. The WEBSITE_URL can be https://plainlychrist.org; you MUST TRUST the site as the site will have the ability to install arbitrary code on your site. The bootstrapping will only occur if there is no data yet on your site. The live data is from a MySQL database, and is automatically converted to SQLite if you are not using MySQL yourself; that conversion is not perfect, so using MySQL is recommended" >&2
     echo "--no-op                         This option will be ignored, and is only needed as a placeholder for automated tools that call this script" >&2
@@ -51,6 +52,11 @@ while [[ $# -gt 0 ]]; do
     --trust-this-ec2-host)
       PUBLIC_HOSTNAME="^$(curl -s http://169.254.169.254/latest/meta-data/public-hostname)$"
       TRUSTED_HOST_PATTERNS+=( ${PUBLIC_HOSTNAME} )
+      shift
+      ;;
+    --trust-this-ec2-local-ipv4)
+      LOCAL_IPV4="^$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4 | sed 's/[.]/\\./g')$"
+      TRUSTED_HOST_PATTERNS+=( ${LOCAL_IPV4} )
       shift
       ;;
     *)
