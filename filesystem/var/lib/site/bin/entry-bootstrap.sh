@@ -58,7 +58,11 @@ function restore_data {
 SALT_FILE=/var/lib/site/salt.txt
 
 function generate_salt_file {
-  openssl rand -base64 64 | tr -d '\n' > $SALT_FILE
+  if [[ -z "$HASH_SALT" ]]; then
+    openssl rand -base64 64 | tr -d '\n' > $SALT_FILE
+  else
+    echo "$HASH_SALT" > $SALT_FILE
+  fi
   chown drupaladmin:www-data $SALT_FILE
   chmod 440 $SALT_FILE
 }
@@ -242,3 +246,6 @@ drush -y pm-enable backup_db
 
 echo Enabling the Flysystem modules ...
 drush -y pm-enable flysystem flysystem_s3
+
+echo Enabling the Loadbalancing cookie
+drush -y pm-enable loadbalancing_cookie

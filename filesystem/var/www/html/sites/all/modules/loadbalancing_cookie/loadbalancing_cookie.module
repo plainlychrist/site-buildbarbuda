@@ -1,0 +1,24 @@
+<?php
+// vim: filetype=php expandtab tabstop=2 shiftwidth=2 autoindent smartindent:
+
+use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Site\Settings;
+
+/**
+ * @file
+ * Places a cookie for sticky sessions. Our simple implementation ... for now ... just places a hash of the user id for logged-in users after login.
+ * Requirement: Don't use cookies for anonymous users.
+ */
+
+/**
+ * Implements hook_user_login().
+ */
+function loadbalancing_cookie_user_login($account) {
+  // We salt the account name. why not?
+  // Note that the salt should be the same across machine machines. If not, it is not really a problem since we have 99% reliable sticky sessions.
+  $saltedAccountName = Settings::getHashSalt() . $account->getAccountName();
+  $loadbalancer_location = Crypt::hashBase64($saltedAccountName);
+
+  // Save it in a cookie
+  user_cookie_save(array('lbloc' => $loadbalancer_location));
+}

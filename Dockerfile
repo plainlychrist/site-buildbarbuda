@@ -166,10 +166,10 @@ RUN apt-get autoremove && \
 # Configuration
 #########
 
-# Initial configuration for the 'default' site. ...
+# Initial configuration for the 'all' site ...
 
-COPY config/sites/default/ /var/lib/site/config/sites/default
-RUN chown -R www-data:www-data /var/lib/site/config/sites/default/
+COPY filesystem/var/www/html/sites/all/modules/ /var/www/html/sites/all/modules
+RUN chown -R www-data:www-data /var/www/html/sites/all/modules
 
 # Snippets used to build the settings.php and .htacess
 COPY settings/ /var/lib/site/settings

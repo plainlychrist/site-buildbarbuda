@@ -1,0 +1,6 @@
+name: Loadbalancing Cookie Module
+description: Places a cookie for logged-in users so that they always go to the same machine, if there are sticky sessions for a load balancer.
+package: Custom
+
+type: module
+core: 8.x

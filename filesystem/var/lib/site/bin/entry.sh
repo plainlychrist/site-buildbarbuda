@@ -6,6 +6,7 @@ function usage()
 {
   echo "Options: " >&2
     echo "-h                              Display this help" >&2
+    echo "--hash-salt SALT                Use the specified hash salt, which we recommend to be the same across machines behind the same Drupal load balancer. If not specified, each installation gets its own unique hash salt, which means CSRF tokens may not work without sticky sessions. A good way to generate a hash salt is: openssl rand -base64 64 | tr -d '\\n'" >&2
     echo "-t|--trust-host-pattern REGEX   Add a trusted host pattern, as per https://www.drupal.org/node/1992030. Can be repeated" >&2
     echo "--trust-this-host               Add the result of running 'hostname' as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
     echo "--trust-this-ec2-host           Add the public DNS name of this EC2 host as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
@@ -24,6 +25,7 @@ function drush()
 TRUSTED_HOST_PATTERNS=()
 USE_MYSQL=0
 BOOTSTRAP_URL=""
+HASH_SALT=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -h|--help)
@@ -36,6 +38,10 @@ while [[ $# -gt 0 ]]; do
     -m|--use-mysql)
       USE_MYSQL=1
       shift
+      ;;
+    --hash-salt)
+      HASH_SALT="$2"
+      shift 2
       ;;
     -b|--bootstrap)
       BOOTSTRAP_URL="$2"
