@@ -172,17 +172,28 @@ generate_salt_file
 if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
   echo Detected we already have active configuration.
 
-  # we need a database with records ... the config_installer later will fail with Drupal\Core\Database\ConnectionNotDefinedException
-  echo Querying to see if we have any data in this site ...
-  if ! drush sql-query --db-url="${DB_URL}" 'SELECT 1 FROM users'; then
-    if [[ -z "${BOOTSTRAP_URL}" ]]; then
-      # use the default bootstrap data
-      restore_data "file:///var/lib/site/bootstrap/default"
-    else
-      restore_data "${BOOTSTRAP_URL}/sites/default/files/public-backups"
-    fi
+  # we only want one "winner" in a distributed Drupal cluster to do the database updates.
+  DATABASE_WRITER=0
+  if drush sql-query --db-url="${DB_URL}" 'CREATE TABLE site_phase1(id INT);'; then
+    DATABASE_WRITER=1
+    echo "Won the election to create the Drupal tables. We are the database creator."
   else
-    echo "  There is data in this site."
+    echo "Could not create the table site_phase1. Another creator on a machine was elected to create the Drupal tables."
+  fi
+
+  if [[ $DATABASE_WRITER -eq 1 ]]; then
+    # we need a database with records ... the config_installer later will fail with Drupal\Core\Database\ConnectionNotDefinedException
+    echo Querying to see if we have any data in this site ...
+    if ! drush sql-query --db-url="${DB_URL}" 'SELECT 1 FROM users'; then
+      if [[ -z "${BOOTSTRAP_URL}" ]]; then
+        # use the default bootstrap data
+        restore_data "file:///var/lib/site/bootstrap/default"
+      else
+        restore_data "${BOOTSTRAP_URL}/sites/default/files/public-backups"
+      fi
+    else
+      echo "  There is data in this site."
+    fi
   fi
 
   echo Doing an already-active configuration site installation ...
@@ -197,15 +208,33 @@ if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
   # Verify settings are good (this is just visual)
   drush core-status
 
-  # Unblock the admin account and rename to our admin user (for now, 'admin'). Then reset password
-  drush sql-query "UPDATE users_field_data SET name='admin', status=1 WHERE uid=1;"
-  drush user-password admin --password="${WEB_ADMIN_PASSWORD}"
+  if [[ $DATABASE_WRITER -eq 1 ]]; then
+    # Unblock the admin account and rename to our admin user (for now, 'admin'). Then reset password
+    drush sql-query "UPDATE users_field_data SET name='admin', status=1 WHERE uid=1;"
+    drush user-password admin --password="${WEB_ADMIN_PASSWORD}"
 
-  # Make sure all entities defined in configuration are present in database
-  drush -y entity-updates
+    # Make sure all entities defined in configuration are present in database
+    drush -y entity-updates
 
-  # Reset drupal caches
-  drush cache-rebuild
+    # Reset drupal caches
+    drush cache-rebuild
+
+    # Say the winner (the "writer") is completed
+    echo "Signaling to the election followers that we have finished creating the Drupal tables."
+    drush sql-query --db-url="${DB_URL}" 'CREATE TABLE site_phase2(id INT);'
+  else
+    # Wait for the winner to complete
+    echo "We'll wait until the elected database creator is complete ..."
+    while true; do
+      if drush sql-query --db-url="${DB_URL}" 'SELECT 1 FROM site_phase2;'; then
+        echo "Finished waiting for the elected database creator to create the database"
+        break
+      else
+        # Wait 5 seconds for retry
+        sleep 5
+      fi
+    done
+  fi
 else
   echo Installing a no-config, no-data site with Drush site-install, with email notification disabled ...
 
