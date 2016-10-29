@@ -8,9 +8,7 @@ MAINTAINER Jonah.Beckford@plainlychrist.org
 ############# Versions
 
 ENV DRUSH_MAJOR_VERSION 8
-ENV DRUSH_CONFIG_EXTRA_FULL_VERSION 8.0.x-dev
 ENV VIDEO_EMBED_FIELD_VERSION 8.1
-ENV DRUPAL8_ZYMPHONIES_THEME_VERSION 8.1
 ENV SYMFONY_INTL_VERSION 3.1
 ENV SYMFONY_FORM_VERSION 3.1
 ENV DRUPAL_NAME_VERSION 8.1
@@ -19,6 +17,7 @@ ENV DRUPAL_WORKBENCH_MODERATION_VERSION 8.1
 ENV DRUPAL_BACKUP_DB_VERSION 8.1
 ENV DRUPAL_FLYSYSTEM_VERSION 8.1
 ENV DRUPAL_FLYSYSTEM_S3_VERSION 8.1
+ENV DRUPAL_ADVAGG 8.2
 ENV MYSQL2SQLITE_VERSION 1b0b5d610c6090422625a2c58d2c23d2296eab3a
 # This, as of 9/8/2016, is a dev dependency (https://packagist.drupal-composer.org/packages/drupal/security_review#dev-8.x-1.x), which needs 'git clone'
 ENV DRUPAL_SECURITY_REVIEW_VERSION 8.1
@@ -107,8 +106,7 @@ RUN \
 
 # Install Drush with Composer: http://www.whaaat.com/installing-drush-8-using-composer
 RUN ~/bin/composer global require \
-        drush/drush:${DRUSH_MAJOR_VERSION}.* \
-        drush/config-extra:${DRUSH_CONFIG_EXTRA_FULL_VERSION}
+        drush/drush:${DRUSH_MAJOR_VERSION}.*
 RUN ln -s ~/.composer/vendor/bin/drush ~/bin/
 
 # Test your install.
@@ -118,11 +116,9 @@ RUN ~/bin/drush core-status
 #########
 
 # Video embedding (https://www.drupal.org/project/video_embed_field)
-# Themes
 # config_installer: Because of bug https://www.drupal.org/node/1613424, we need this custom install profile
 RUN ~/bin/drush dl config_installer
-RUN ~/bin/composer require "drupal/video_embed_field ~${VIDEO_EMBED_FIELD_VERSION}" && \
-        ~/bin/composer require "drupal/drupal8_zymphonies_theme ~${DRUPAL8_ZYMPHONIES_THEME_VERSION}"
+RUN ~/bin/composer require "drupal/video_embed_field ~${VIDEO_EMBED_FIELD_VERSION}"
 
 # Install symfony/intl: commerceguys/addressing suggests installing symfony/intl (to use it as the source of country data)
 # Install symfony/form: commerceguys/addressing suggests installing symfony/form (to generate Symfony address forms)
@@ -130,12 +126,14 @@ RUN ~/bin/composer require "drupal/video_embed_field ~${VIDEO_EMBED_FIELD_VERSIO
 RUN ~/bin/composer require "symfony/intl ~${SYMFONY_INTL_VERSION}" "symfony/form ~${SYMFONY_FORM_VERSION}" \
     "drupal/name ~${DRUPAL_NAME_VERSION}" "drupal/address ~${DRUPAL_ADDRESS_VERSION}"
 
-# Install workbench moderation
+# Install Backup and Migrate
+# Install Advanced CSS/JS Aggregation
 # Install flysystem so we can run across multiple machines
 # Install security review
-# Install Backup and Migrate
+# Install workbench moderation
 RUN ~/bin/composer require \
         "drupal/backup_db ~${DRUPAL_BACKUP_DB_VERSION}" \
+        "drupal/advagg ~${DRUPAL_ADVAGG}" \
         "drupal/flysystem ~${DRUPAL_FLYSYSTEM_VERSION}" \
         "drupal/flysystem_s3 ~${DRUPAL_FLYSYSTEM_S3_VERSION}" \
         "drupal/security_review ~${DRUPAL_SECURITY_REVIEW_VERSION}" \

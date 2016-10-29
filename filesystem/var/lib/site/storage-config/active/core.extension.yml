@@ -1,4 +1,5 @@
 module:
+  advagg: 0
   automated_cron: 0
   backup_db: 0
   block: 0
@@ -24,6 +25,7 @@ module:
   history: 0
   image: 0
   link: 0
+  loadbalancing_cookie: 0
   menu_ui: 0
   node: 0
   options: 0

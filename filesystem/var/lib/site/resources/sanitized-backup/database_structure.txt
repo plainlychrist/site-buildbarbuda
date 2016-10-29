@@ -63,10 +63,13 @@ CREATE TABLE `block_content_field_data` (
   `changed` int(11) DEFAULT NULL,
   `revision_translation_affected` tinyint(4) DEFAULT NULL,
   `default_langcode` tinyint(4) NOT NULL,
+  `revision_created` int(11) DEFAULT NULL,
+  `revision_user` int(10) unsigned DEFAULT NULL COMMENT 'The ID of the target entity.',
   PRIMARY KEY (`id`,`langcode`),
   KEY `block_content__id__default_langcode__langcode` (`id`,`default_langcode`,`langcode`),
   KEY `block_content__revision_id` (`revision_id`),
-  KEY `block_content_field__type__target_id` (`type`)
+  KEY `block_content_field__type__target_id` (`type`),
+  KEY `block_content_field__revision_user__target_id` (`revision_user`)
 );
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -79,8 +82,11 @@ CREATE TABLE `block_content_field_revision` (
   `changed` int(11) DEFAULT NULL,
   `revision_translation_affected` tinyint(4) DEFAULT NULL,
   `default_langcode` tinyint(4) NOT NULL,
+  `revision_created` int(11) DEFAULT NULL,
+  `revision_user` int(10) unsigned DEFAULT NULL COMMENT 'The ID of the target entity.',
   PRIMARY KEY (`revision_id`,`langcode`),
-  KEY `block_content__id__default_langcode__langcode` (`id`,`default_langcode`,`langcode`)
+  KEY `block_content__id__default_langcode__langcode` (`id`,`default_langcode`,`langcode`),
+  KEY `block_content_field__revision_user__target_id` (`revision_user`)
 );
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -110,6 +116,20 @@ CREATE TABLE `block_content_revision__body` (
   KEY `bundle` (`bundle`),
   KEY `revision_id` (`revision_id`),
   KEY `body_format` (`body_format`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cache_advagg_minify` (
+  `cid` varchar(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '' COMMENT 'Primary Key: Unique cache ID.',
+  `data` longblob COMMENT 'A collection of data to cache.',
+  `expire` int(11) NOT NULL DEFAULT '0' COMMENT 'A Unix timestamp indicating when the cache entry should expire, or -1 for never.',
+  `created` decimal(14,3) NOT NULL DEFAULT '0.000' COMMENT 'A timestamp with millisecond precision indicating when the cache entry was created.',
+  `serialized` smallint(6) NOT NULL DEFAULT '0' COMMENT 'A flag to indicate whether content is serialized (1) or not (0).',
+  `tags` longtext COMMENT 'Space-separated list of cache tags for this entry.',
+  `checksum` varchar(255) CHARACTER SET ascii NOT NULL COMMENT 'The tag invalidation checksum when this entry was saved.',
+  PRIMARY KEY (`cid`),
+  KEY `expire` (`expire`)
 );
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -399,19 +419,6 @@ CREATE TABLE `file_usage` (
   KEY `type_id` (`type`,`id`),
   KEY `fid_count` (`fid`,`count`),
   KEY `fid_module` (`fid`,`module`)
-);
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `flood` (
-  `fid` int(11) NOT NULL COMMENT 'Unique flood event ID.',
-  `event` varchar(64) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'Name of event (e.g. contact).',
-  `identifier` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'Identifier of the visitor, such as an IP address or hostname.',
-  `timestamp` int(11) NOT NULL DEFAULT '0' COMMENT 'Timestamp of the event.',
-  `expiration` int(11) NOT NULL DEFAULT '0' COMMENT 'Expiration timestamp. Expired events are purged on cron run.',
-  PRIMARY KEY (`fid`),
-  KEY `allow` (`event`,`identifier`,`timestamp`),
-  KEY `purge` (`expiration`)
 );
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -875,6 +882,18 @@ CREATE TABLE `shortcut_set_users` (
   `set_name` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The shortcut_set.set_name that will be displayed for this user.',
   PRIMARY KEY (`uid`),
   KEY `set_name` (`set_name`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `site_phase1` (
+  `id` int(11) DEFAULT NULL
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `site_phase2` (
+  `id` int(11) DEFAULT NULL
 );
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

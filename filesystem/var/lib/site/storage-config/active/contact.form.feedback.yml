@@ -10,3 +10,5 @@ recipients:
   - no-reply@plainlychrist.org
 reply: ''
 weight: 0
+message: 'Your message has been sent.'
+redirect: ''

@@ -277,5 +277,8 @@ drush -y pm-enable backup_db
 echo Enabling the Flysystem modules ...
 drush -y pm-enable flysystem flysystem_s3
 
+echo Enabling the Advanced CSS JS aggregation module ...
+drush -y pm-enable advagg
+
 echo Enabling the Loadbalancing cookie
 drush -y pm-enable loadbalancing_cookie
