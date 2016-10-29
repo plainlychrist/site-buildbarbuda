@@ -5,8 +5,11 @@ set -euo pipefail
 # global variables
 DRUSH=~drupaladmin/bin/drush
 DT=$(/bin/date --utc +%Y-%m-%d.%H-%M-%S)
-SKIP_TABLES_LIST=users_field_data
 STRUCTURE_TABLES_LIST=backup_db,batch,cache_bootstrap,cache_config,cache_container,cache_data,cache_default,cache_discovery,cache_dynamic_page_cache,cache_entity,cache_flysystem,cache_menu,cache_render,cache_toolbar,cachetags,flood,history,queue,semaphore,sessions,watchdog
+
+# skip users_field_data because it has identifiable information in it
+# skip site_phase[12] because it is used only for signalling multiple machines in the Drupal installation
+SKIP_TABLES_LIST=users_field_data,site_phase1,site_phase2
 
 # relative paths
 echo "Moving into /var/www/html directory ..."

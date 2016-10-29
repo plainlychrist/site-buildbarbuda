@@ -45,6 +45,7 @@ function restore_data {
   $(drush sql-connect --db-url="${DB_URL}") < ${BOOTSTRAP_DIR}/sanitized-restore.sql
 
   # Restore any files to sites/default/files
+  install -d /var/www/html/sites/default/files
   tar --extract --xz --directory /var/www/html/sites/default/files \
     --exclude "*.php" \
     --exclude ".htaccess" \
