@@ -1,7 +1,7 @@
 # Writing Guidelines: https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/
 # vim: set tabstop=4 shiftwidth=4 expandtab :
 
-FROM drupal:8.2
+FROM drupal:8.2.1
 
 MAINTAINER Jonah.Beckford@plainlychrist.org
 
@@ -113,6 +113,7 @@ RUN ln -s ~/.composer/vendor/bin/drush ~/bin/
 RUN ~/bin/drush core-status
 
 # Modules
+#   To mitigate docker build running out of memory, we split up the composer require commands
 #########
 
 # Video embedding (https://www.drupal.org/project/video_embed_field)
@@ -133,7 +134,8 @@ RUN ~/bin/composer require "symfony/intl ~${SYMFONY_INTL_VERSION}" "symfony/form
 # Install workbench moderation
 RUN ~/bin/composer require \
         "drupal/backup_db ~${DRUPAL_BACKUP_DB_VERSION}" \
-        "drupal/advagg ~${DRUPAL_ADVAGG}" \
+        "drupal/advagg ~${DRUPAL_ADVAGG}" && \
+    ~/bin/composer require \
         "drupal/flysystem ~${DRUPAL_FLYSYSTEM_VERSION}" \
         "drupal/flysystem_s3 ~${DRUPAL_FLYSYSTEM_S3_VERSION}" \
         "drupal/security_review ~${DRUPAL_SECURITY_REVIEW_VERSION}" \
