@@ -1,0 +1,6 @@
+services:
+  loadbalancing_cookie.language_cookie_subscriber:
+    class: Drupal\loadbalancing_cookie\EventSubscriber\LoadBalancingResponseEventSubscriber
+    arguments: ['@config.factory']
+    tags:
+      - { name: 'event_subscriber' }

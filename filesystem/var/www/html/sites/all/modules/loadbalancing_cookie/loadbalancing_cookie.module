@@ -19,6 +19,6 @@ function loadbalancing_cookie_user_login($account) {
   $saltedAccountName = Settings::getHashSalt() . $account->getAccountName();
   $loadbalancer_location = Crypt::hashBase64($saltedAccountName);
 
-  // Save it in a cookie
-  user_cookie_save(array('lbloc' => $loadbalancer_location));
+  // Save it in the request so that our Symfony event listener can set the cookie using the Symfony $response
+  \Drupal::request()->attributes->set('loadbalancing_cookie_location', $loadbalancer_location);
 }
