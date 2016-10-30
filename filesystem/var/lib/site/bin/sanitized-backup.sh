@@ -31,9 +31,8 @@ set -o pipefail
 
 # Do the backup of the majority of tables
 DATA_EXTRA='--skip-comments'
-echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt.gz ...
+echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt ...
 ${DRUSH} sql-dump --extra="${DATA_EXTRA}" --ordered-dump --structure-tables-list=${STRUCTURE_TABLES_LIST} --skip-tables-list=${SKIP_TABLES_LIST} --result-file=${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt
-gzip ${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt
 
 # SECFIX.1: sql-dump --tables-list=xxx, if xxx does not exist, will dump all the tables. So we create uniquely named tables so no race condition attacks
 SANTBL_UFD="san_$(echo $$ $(/bin/hostname) $(/bin/date +%s.%N) | /usr/bin/sha224sum | /usr/bin/awk '{print $1}')"
@@ -57,7 +56,7 @@ ${DRUSH} sql-query "INSERT INTO ${SANTBL_UFD}
     FROM users_field_data"
 
 # Do the backup of sanitized tables
-echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-dump.sql.txt.gz ...
+echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-dump.sql.txt ...
 ${DRUSH} sql-dump --extra="${DATA_EXTRA}" --ordered-dump --tables-list=${SANITIZED_TABLES_LIST} --result-file=${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown
 if [ "$(/bin/grep '^CREATE TABLE' ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown | /usr/bin/wc -l)" != "1" ]; then
   # another failsafe in case the SECFIX.1 fails ... we should only have one (1) table ... the sanitized table!
@@ -65,14 +64,12 @@ if [ "$(/bin/grep '^CREATE TABLE' ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unk
   exit 1
 else
   # The webserver will not serve files with a leading dot "." nor with unknown extensions, which we did on purpose to mitigate SECFIX.1
-  gzip -c ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown > ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-dump.sql.txt.gz
-  rm -f ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown
+  mv ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-dump.sql.txt
 fi
 
 # Make sure the sanitized tables restore themselves
 echo 'DROP TABLE IF EXISTS `users_field_data`;' > ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-restore.sql.txt
 echo 'ALTER TABLE `'"${SANTBL_UFD}"'` RENAME TO `users_field_data`;' >> ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-restore.sql.txt
-gzip ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-restore.sql.txt
 
 # Cleanup gracefully now that we are done (rather than hope that EXIT trap works)
 cleanup_sanitized
@@ -106,4 +103,4 @@ echo Updated ${REL_PUBLIC_BACKUPS}/latest.txt. Done
 echo Removing much older backups ...
 find /var/www/html/sites/default/files/public-backups -type f -mtime +15 -exec rm -vf {} +
 
-echo Done
+echo COMPLETE: Done
