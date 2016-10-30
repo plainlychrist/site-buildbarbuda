@@ -30,8 +30,9 @@ ${DRUSH} sql-dump --extra="${DUMP_EXTRA}" | /usr/bin/diff --unchanged-line-forma
 set -o pipefail
 
 # Do the backup of the majority of tables
+DATA_EXTRA='--skip-comments'
 echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt.gz ...
-${DRUSH} sql-dump --extra='--skip-comments' --structure-tables-list=${STRUCTURE_TABLES_LIST} --skip-tables-list=${SKIP_TABLES_LIST} --result-file=${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt
+${DRUSH} sql-dump --extra="${DATA_EXTRA}" --ordered-dump --structure-tables-list=${STRUCTURE_TABLES_LIST} --skip-tables-list=${SKIP_TABLES_LIST} --result-file=${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt
 gzip ${REL_PUBLIC_BACKUPS}/${DT}.plain-dump.sql.txt
 
 # SECFIX.1: sql-dump --tables-list=xxx, if xxx does not exist, will dump all the tables. So we create uniquely named tables so no race condition attacks
@@ -57,9 +58,9 @@ ${DRUSH} sql-query "INSERT INTO ${SANTBL_UFD}
 
 # Do the backup of sanitized tables
 echo Creating ${REL_PUBLIC_BACKUPS}/${DT}.sanitized-dump.sql.txt.gz ...
-${DRUSH} sql-dump --extra='--skip-comments' --tables-list=${SANITIZED_TABLES_LIST} --result-file=${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown
+${DRUSH} sql-dump --extra="${DATA_EXTRA}" --ordered-dump --tables-list=${SANITIZED_TABLES_LIST} --result-file=${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown
 if [ "$(/bin/grep '^CREATE TABLE' ${REL_PUBLIC_BACKUPS}/.${DT}.sanitized.sql.unknown | /usr/bin/wc -l)" != "1" ]; then
-  # another failsafe in case the SECFIX.1 fails ... we should only have one (1) table!
+  # another failsafe in case the SECFIX.1 fails ... we should only have one (1) table ... the sanitized table!
   echo "SECFIX.1"
   exit 1
 else

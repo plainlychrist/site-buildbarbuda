@@ -28,13 +28,15 @@ ENV DRUPAL_SECURITY_REVIEW_VERSION 8.1
 
 ############## APT
 
+# Install gawk so mysql2sqlite does not Segfault on large bootstrap databases
+# Install git so that Composer, when fetching dev dependencies, can do a 'git clone'
 # Install a database client, which is used by 'drush up' and 'drush sql-dump'
 #   mysql-client or sqlite3
-# Install git so that Composer, when fetching dev dependencies, can do a 'git clone'
 # Install self-signed SSL (auto-generated) for Apache HTTPS
 # Install supervisor so we can run multiple processes in one container
 RUN apt-get -y update
 RUN apt-get -y install \
+        gawk \
         git \
         mysql-client \
         sqlite3 \

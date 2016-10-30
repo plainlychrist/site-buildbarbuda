@@ -25,8 +25,8 @@ function restore_data {
   # Copy or convert the downloaded file to *.sql
   if [[ $USE_SQLITE -eq 1 ]]; then
     # SQLite needs to be converted from MySQL
-    ~drupaladmin/bin/mysql2sqlite ${BOOTSTRAP_DIR}/plain-dump.sql.txt > ${BOOTSTRAP_DIR}/plain-dump.sql
-    ~drupaladmin/bin/mysql2sqlite ${BOOTSTRAP_DIR}/sanitized-dump.sql.txt > ${BOOTSTRAP_DIR}/sanitized-dump.sql
+    gawk -f ~drupaladmin/bin/mysql2sqlite ${BOOTSTRAP_DIR}/plain-dump.sql.txt > ${BOOTSTRAP_DIR}/plain-dump.sql
+    gawk -f ~drupaladmin/bin/mysql2sqlite ${BOOTSTRAP_DIR}/sanitized-dump.sql.txt > ${BOOTSTRAP_DIR}/sanitized-dump.sql
     install ${BOOTSTRAP_DIR}/sanitized-restore.sql.txt ${BOOTSTRAP_DIR}/sanitized-restore.sql
     # make sure we have at least an empty SQLite database
     install -d "${SQLITE_DIR}" # create parent directories as root if not present
