@@ -1,12 +1,16 @@
 # Writing Guidelines: https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/
 # vim: set tabstop=4 shiftwidth=4 expandtab :
 
-FROM drupal:8.2.1
+FROM drupal:8.2.1-fpm
 
 MAINTAINER Jonah.Beckford@plainlychrist.org
 
+WORKDIR /var/www/html
+
 ############# Versions
 
+# https://hub.docker.com/_/nginx/ 1.11.5
+ENV NGINX_VERSION 1.11.5-1~jessie
 ENV DRUSH_MAJOR_VERSION 8
 ENV VIDEO_EMBED_FIELD_VERSION 8.1
 ENV SYMFONY_INTL_VERSION 3.1
@@ -32,7 +36,7 @@ ENV DRUPAL_SECURITY_REVIEW_VERSION 8.1
 # Install git so that Composer, when fetching dev dependencies, can do a 'git clone'
 # Install a database client, which is used by 'drush up' and 'drush sql-dump'
 #   mysql-client or sqlite3
-# Install self-signed SSL (auto-generated) for Apache HTTPS
+# Install self-signed SSL (auto-generated) for HTTPS
 # Install supervisor so we can run multiple processes in one container
 RUN apt-get -y update
 RUN apt-get -y install \
@@ -43,28 +47,27 @@ RUN apt-get -y install \
         ssl-cert openssl-blacklist \
         supervisor
 
+############## Nginx 1.11.5
+# - skips installing nginx-module-*
+# - skips remove /var/lib/apt/lists/*
+
+RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62 \
+	&& echo "deb http://nginx.org/packages/mainline/debian/ jessie nginx" >> /etc/apt/sources.list \
+	&& apt-get update \
+	&& apt-get install --no-install-recommends --no-install-suggests -y \
+						ca-certificates \
+						nginx=${NGINX_VERSION} \
+						gettext-base
+
+# forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+  && ln -sf /dev/stderr /var/log/nginx/error.log
+
+EXPOSE 80 443
+
 ############## Our customizations
 
 COPY filesystem/etc/ /etc/
-
-############## Apache
-
-# ssl: We want HTTPS to be enabled
-# headers: We want to customize the HTTP headers
-# site-web: (filesystem)/etc/apache2/sites-available/site-web.conf
-# 000-default: Disable the HTTP 80 site
-RUN     a2enmod ssl && \
-        a2enmod headers && \
-        a2ensite site-web && \
-        a2dissite 000-default
-
-# Since we have SSL, enable only port 443 (you can expose port 80 on the command line, or with Docker Compose, if you have a properly-configured SSL proxy)
-EXPOSE 443
-
-############# PHP extensions
-
-# Install bcmath, needed by address
-RUN docker-php-ext-install bcmath
 
 ########################
 ###### DRUPALADMIN #####
