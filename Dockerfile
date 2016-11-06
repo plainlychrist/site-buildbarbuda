@@ -65,10 +65,6 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 
 EXPOSE 80 443
 
-############## Our customizations
-
-COPY filesystem/etc/ /etc/
-
 ########################
 ###### DRUPALADMIN #####
 ########################
@@ -170,6 +166,10 @@ RUN apt-get autoremove && \
 
 # Configuration
 #########
+
+COPY filesystem/etc/ /etc/
+COPY filesystem/usr/local/etc/ /usr/local/etc/
+RUN rm -f /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Initial configuration for the 'all' site ...
 
