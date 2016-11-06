@@ -206,10 +206,10 @@ if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
   generate_settings >> ${SETTINGS}
   generate_settings_file_config >> ${SETTINGS}
 
-  # Verify settings are good (this is just visual)
-  drush core-status
-
   if [[ $DATABASE_WRITER -eq 1 ]]; then
+    # Verify settings are good (this is just visual)
+    drush core-status
+
     # Unblock the admin account and rename to our admin user (for now, 'admin'). Then reset password
     drush sql-query "UPDATE users_field_data SET name='admin', status=1 WHERE uid=1;"
     drush user-password admin --password="${WEB_ADMIN_PASSWORD}"
@@ -235,6 +235,9 @@ if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
         sleep 5
       fi
     done
+
+    # Verify settings are good (this is just visual)
+    drush core-status
   fi
 else
   echo Installing a no-config, no-data site with Drush site-install, with email notification disabled ...
