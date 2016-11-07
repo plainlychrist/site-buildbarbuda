@@ -24,6 +24,9 @@ ENV MYSQL2SQLITE_VERSION 1b0b5d610c6090422625a2c58d2c23d2296eab3a
 # This, as of 9/8/2016, is a dev dependency (https://packagist.drupal-composer.org/packages/drupal/security_review#dev-8.x-1.x), which needs 'git clone'
 ENV DRUPAL_SECURITY_REVIEW_VERSION 8.1
 
+# https://developers.google.com/speed/pagespeed/module/release_notes
+ENV NPS_VERSION 1.11.33.4
+
 ########################
 ######## ROOT ##########
 ########################
@@ -62,6 +65,40 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
   && ln -sf /dev/stderr /var/log/nginx/error.log
 
 EXPOSE 80 443
+
+# Install Google Page Speed Module for nginx
+#    https://developers.google.com/speed/pagespeed/module/build_ngx_pagespeed_from_source
+##########
+
+RUN apt-get install --no-install-recommends --no-install-suggests -y build-essential zlib1g-dev libpcre3 libpcre3-dev unzip \
+  && set -x \
+  && cd \
+  && NGINX_VERSION=$(nginx -v 2>&1 | sed 's#.*/##') \
+  && PS_NGX_EXTRA_FLAGS=$(nginx -V 2>&1 | awk '/configure arguments:/{$1=""; $2=""; print}') \
+  && curl -LO https://github.com/pagespeed/ngx_pagespeed/archive/release-${NPS_VERSION}-beta.zip \
+  && unzip release-${NPS_VERSION}-beta.zip  \
+  && cd ngx_pagespeed-release-${NPS_VERSION}-beta/  \
+  && curl -LO https://dl.google.com/dl/page-speed/psol/${NPS_VERSION}.tar.gz  \
+  && tar -xzvf ${NPS_VERSION}.tar.gz  \
+  && cd  \
+  && curl -LO http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz  \
+  && tar -xvzf nginx-${NGINX_VERSION}.tar.gz  \
+  && cd nginx-${NGINX_VERSION}/  \
+  && echo ./configure --add-dynamic-module=$HOME/ngx_pagespeed-release-${NPS_VERSION}-beta $PS_NGX_EXTRA_FLAGS > /tmp/runit  \
+  && sh /tmp/runit  \
+  && rm /tmp/runit \
+  && make \
+  && install -pv ./objs/ngx_pagespeed.so /etc/nginx/modules/  \
+  && cd \
+  && rm -rf release-${NPS_VERSION}-beta.zip ngx_pagespeed-release-${NPS_VERSION}-beta/ nginx-${NGINX_VERSION}.tar.gz nginx-${NGINX_VERSION}/ \
+  && apt-get remove -y build-essential zlib1g-dev libpcre3-dev unzip
+
+# Clean up space and unneeded packages
+##########
+
+RUN apt-get autoremove -y && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ########################
 ###### DRUPALADMIN #####
@@ -151,13 +188,6 @@ RUN ~/bin/composer clear-cache
 ########################
 
 USER root
-
-# Clean up space and unneeded packages
-##########
-
-RUN apt-get autoremove && \
-        apt-get clean && \
-        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Configuration
 #########
