@@ -5,7 +5,7 @@ set -euo pipefail
 # global variables
 DRUSH=~drupaladmin/bin/drush
 DT=$(/bin/date --utc +%Y-%m-%d.%H-%M-%S)
-STRUCTURE_TABLES_LIST=backup_db,batch,cache_bootstrap,cache_config,cache_container,cache_data,cache_default,cache_discovery,cache_dynamic_page_cache,cache_entity,cache_flysystem,cache_menu,cache_render,cache_toolbar,cachetags,flood,history,queue,semaphore,sessions,watchdog
+STRUCTURE_TABLES_LIST=backup_db,batch,cache_bootstrap,cache_config,cache_container,cache_data,cache_default,cache_discovery,cache_dynamic_page_cache,cache_entity,cache_menu,cache_render,cache_toolbar,cachetags,flood,history,queue,semaphore,sessions,watchdog
 
 # skip users_field_data because it has identifiable information in it
 # skip site_phase[12] because it is used only for signalling multiple machines in the Drupal installation
@@ -86,11 +86,6 @@ echo Creating tar backup of public files at ${REL_PUBLIC_BACKUPS}/${DT}.sites-de
     --exclude="./css/css_*" \
     --exclude="./php/twig/*" \
     --exclude="./public-backups/*" \
-    --exclude ".htaccess" \
-    .
-
-echo Creating tar backup of flysystem files at ${REL_PUBLIC_BACKUPS}/${DT}.flysystem-main.tar.xz ...
-/bin/tar --create --xz --directory /var/www/flysystem --file ${REL_PUBLIC_BACKUPS}/${DT}.flysystem-main.tar.xz \
     --exclude ".htaccess" \
     .
 

@@ -19,8 +19,6 @@ ENV DRUPAL_NAME_VERSION 8.1
 ENV DRUPAL_ADDRESS_VERSION 8.1
 ENV DRUPAL_WORKBENCH_MODERATION_VERSION 8.1
 ENV DRUPAL_BACKUP_DB_VERSION 8.1
-ENV DRUPAL_FLYSYSTEM_VERSION 8.1
-ENV DRUPAL_FLYSYSTEM_S3_VERSION 8.1
 ENV DRUPAL_ADVAGG 8.2
 ENV MYSQL2SQLITE_VERSION 1b0b5d610c6090422625a2c58d2c23d2296eab3a
 # This, as of 9/8/2016, is a dev dependency (https://packagist.drupal-composer.org/packages/drupal/security_review#dev-8.x-1.x), which needs 'git clone'
@@ -130,15 +128,12 @@ RUN ~/bin/composer require "symfony/intl ~${SYMFONY_INTL_VERSION}" "symfony/form
 
 # Install Backup and Migrate
 # Install Advanced CSS/JS Aggregation
-# Install flysystem so we can run across multiple machines
 # Install security review
 # Install workbench moderation
 RUN ~/bin/composer require \
         "drupal/backup_db ~${DRUPAL_BACKUP_DB_VERSION}" \
         "drupal/advagg ~${DRUPAL_ADVAGG}" && \
     ~/bin/composer require \
-        "drupal/flysystem ~${DRUPAL_FLYSYSTEM_VERSION}" \
-        "drupal/flysystem_s3 ~${DRUPAL_FLYSYSTEM_S3_VERSION}" \
         "drupal/security_review ~${DRUPAL_SECURITY_REVIEW_VERSION}" \
         "drupal/workbench_moderation ~${DRUPAL_WORKBENCH_MODERATION_VERSION}"
 
@@ -185,7 +180,6 @@ COPY settings/ /var/lib/site/settings
 COPY filesystem/var/lib/site/ /var/lib/site/
 RUN chmod 500 /var/lib/site/bin/*.sh && \
   chown www-data /var/lib/site/bin/sanitized-backup.sh && \
-  install -o drupaladmin -g www-data -m 770 -d /var/www/flysystem && \
   install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default && \
   install -o drupaladmin -g www-data -m 770 -d /var/www/private && \
   chown -R drupaladmin:www-data /var/lib/site/storage-config/active

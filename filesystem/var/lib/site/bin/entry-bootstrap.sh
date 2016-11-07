@@ -20,7 +20,6 @@ function restore_data {
   curl --include --progress-bar "${RESTORE_URL}/${BOOTSTRAP_LATEST}.sanitized-dump.sql.txt" > ${BOOTSTRAP_DIR}/sanitized-dump.sql.txt
   curl --include --progress-bar "${RESTORE_URL}/${BOOTSTRAP_LATEST}.sanitized-restore.sql.txt" > ${BOOTSTRAP_DIR}/sanitized-restore.sql.txt
   curl --include --progress-bar "${RESTORE_URL}/${BOOTSTRAP_LATEST}.sites-default-files.tar.xz" > ${BOOTSTRAP_DIR}/sites-default-files.tar.xz
-  curl --include --progress-bar "${RESTORE_URL}/${BOOTSTRAP_LATEST}.flysystem-main.tar.xz" > ${BOOTSTRAP_DIR}/flysystem-main.tar.xz
 
   # Copy or convert the downloaded file to *.sql
   if [[ $USE_SQLITE -eq 1 ]]; then
@@ -50,10 +49,6 @@ function restore_data {
     --exclude "*.php" \
     --exclude ".htaccess" \
     --file ${BOOTSTRAP_DIR}/sites-default-files.tar.xz
-  tar --extract --xz --directory /var/www/flysystem \
-    --exclude "*.php" \
-    --exclude ".htaccess" \
-    --file ${BOOTSTRAP_DIR}/flysystem-main.tar.xz
 }
 
 SALT_FILE=/var/lib/site/salt.txt
@@ -98,9 +93,6 @@ function generate_settings {
 
 \$settings['install_profile'] = 'standard';
 EOF
-
-  # flywheel for local + remote file access
-  cat /var/lib/site/settings/flysystem-local.php
 
   # database configuration
   if [[ $USE_SQLITE -eq 1 ]]; then
@@ -276,9 +268,6 @@ drush -y pm-enable update
 
 echo Enabling the Backup Database module ...
 drush -y pm-enable backup_db
-
-echo Enabling the Flysystem modules ...
-drush -y pm-enable flysystem flysystem_s3
 
 echo Enabling the Advanced CSS JS aggregation module ...
 drush -y pm-enable advagg

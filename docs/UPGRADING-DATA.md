@@ -19,7 +19,7 @@ Your typical workflow would be:
     * Go back and re-run this step, and make sure it doesn't fail.
 9. Run the following to make a new bootstrap database template from the sanitized backup:
     ```
-    (cd filesystem/var/lib/site/bootstrap/default && BURL=https://localhost/sites/default/files/public-backups/ && curl -k -s -o /tmp/latest.txt $BURL/latest.txt && LTT=$(< /tmp/latest.txt) && B=2010-01-01.00-00-000 && echo $B > latest.txt && curl -k -s -o $B.plain-dump.sql.txt $BURL/$LTT.plain-dump.sql.txt && curl -k -s -o $B.sanitized-dump.sql.txt $BURL/$LTT.sanitized-dump.sql.txt && curl -k -s -o $B.sanitized-restore.sql.txt $BURL/$LTT.sanitized-restore.sql.txt && curl -k -s -o $B.sites-default-files.tar.xz $BURL/$LTT.sites-default-files.tar.xz && curl -k -s -o $B.flysystem-main.tar.xz $BURL/$LTT.flysystem-main.tar.xz)
+    (cd filesystem/var/lib/site/bootstrap/default && BURL=https://localhost/sites/default/files/public-backups/ && curl -k -s -o /tmp/latest.txt $BURL/latest.txt && LTT=$(< /tmp/latest.txt) && B=2010-01-01.00-00-000 && echo $B > latest.txt && curl -k -s -o $B.plain-dump.sql.txt $BURL/$LTT.plain-dump.sql.txt && curl -k -s -o $B.sanitized-dump.sql.txt $BURL/$LTT.sanitized-dump.sql.txt && curl -k -s -o $B.sanitized-restore.sql.txt $BURL/$LTT.sanitized-restore.sql.txt && curl -k -s -o $B.sites-default-files.tar.xz $BURL/$LTT.sites-default-files.tar.xz)
     ```
 10. Rebuild the Docker image on your machine with `docker build -t plainlychrist/site-web:unstable .`
 

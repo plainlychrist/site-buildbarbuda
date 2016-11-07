@@ -125,7 +125,6 @@ find /var/lib/site/storage-config/active -type d -exec chmod 770 {} \;
 find /var/lib/site/storage-config/active -type f -exec chmod 664 {} \;
 
 # Applying security advisory: https://www.drupal.org/SA-CORE-2013-003
-install -o drupaladmin -g www-data -m 444 /var/lib/site/settings/private.htaccess /var/www/flysystem/.htaccess
 install -o drupaladmin -g www-data -m 444 /var/lib/site/settings/private.htaccess /var/www/private/.htaccess
 
 # Launch Apache and cron, with a supervisor to manage the two processes
