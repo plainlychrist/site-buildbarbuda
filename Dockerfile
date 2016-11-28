@@ -20,6 +20,7 @@ ENV DRUPAL_ADDRESS_VERSION 8.1
 ENV DRUPAL_WORKBENCH_MODERATION_VERSION 8.1
 ENV DRUPAL_BACKUP_DB_VERSION 8.1
 ENV DRUPAL_ADVAGG 8.2
+ENV DRUPAL_BOOTSTRAP_VERSION 8.3
 ENV MYSQL2SQLITE_VERSION 1b0b5d610c6090422625a2c58d2c23d2296eab3a
 # This, as of 9/8/2016, is a dev dependency (https://packagist.drupal-composer.org/packages/drupal/security_review#dev-8.x-1.x), which needs 'git clone'
 ENV DRUPAL_SECURITY_REVIEW_VERSION 8.1
@@ -179,6 +180,10 @@ RUN ~/bin/composer require \
     ~/bin/composer require \
         "drupal/security_review ~${DRUPAL_SECURITY_REVIEW_VERSION}" \
         "drupal/workbench_moderation ~${DRUPAL_WORKBENCH_MODERATION_VERSION}"
+
+# Install Bootstrap base theme
+RUN ~/bin/composer require \
+        "drupal/bootstrap ~${DRUPAL_BOOTSTRAP_VERSION}"
 
 # Install mysql2sqlite
 RUN curl "https://raw.githubusercontent.com/dumblob/mysql2sqlite/${MYSQL2SQLITE_VERSION}/mysql2sqlite" > ~/bin/mysql2sqlite && \

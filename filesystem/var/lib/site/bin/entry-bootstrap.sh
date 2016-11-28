@@ -272,5 +272,8 @@ drush -y pm-enable backup_db
 echo Enabling the Advanced CSS JS aggregation module ...
 drush -y pm-enable advagg
 
+echo Enabling the Bootstrap base theme ...
+drush -y pm-enable bootstrap
+
 echo Enabling the Loadbalancing cookie
 drush -y pm-enable loadbalancing_cookie
