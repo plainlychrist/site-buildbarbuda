@@ -1,7 +1,7 @@
 # Writing Guidelines: https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/
 # vim: set tabstop=4 shiftwidth=4 expandtab :
 
-FROM drupal:8.2.1-fpm
+FROM drupal:8.2.3-fpm
 
 MAINTAINER Jonah.Beckford@plainlychrist.org
 
@@ -99,6 +99,12 @@ RUN apt-get install --no-install-recommends --no-install-suggests -y build-essen
 RUN apt-get autoremove -y && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Get rid of PHP extensions we don't need
+##########
+
+# We won't use: PostgreSQL (comes from Drupal Dockerfile)
+RUN rm -f /usr/local/etc/php/conf.d/docker-php-ext-pdo_pgsql.ini
 
 ########################
 ###### DRUPALADMIN #####
