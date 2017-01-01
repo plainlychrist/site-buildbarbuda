@@ -1,0 +1,22 @@
+uuid: c5110af8-52a4-4ceb-ac4f-0f871df45f6a
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - directjude
+_core:
+  default_config_hash: oXUb3JZR2WW5VOdw4HrhRicCsq51mCgLfRyvheG68ck
+id: directjude_breadcrumbs
+theme: directjude
+region: navigation
+weight: 0
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  provider: system
+  label_display: '0'
+visibility: {  }

@@ -1,0 +1,22 @@
+uuid: a6d2ee9f-d281-42bf-b5e6-7590911a811e
+langcode: en
+status: true
+dependencies:
+  theme:
+    - directjude
+_core:
+  default_config_hash: X9I1OB0W3WlWtrK-CNcg6hNWwa8wficanpH8pYnDZDE
+id: directjude_local_tasks
+theme: directjude
+region: content
+weight: -40
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: Tabs
+  provider: core
+  label_display: '0'
+  primary: true
+  secondary: true
+visibility: {  }

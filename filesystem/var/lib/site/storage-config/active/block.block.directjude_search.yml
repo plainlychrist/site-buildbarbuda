@@ -1,0 +1,22 @@
+uuid: f7ed3bae-93bb-4e76-86a5-9f979d71c53e
+langcode: en
+status: true
+dependencies:
+  module:
+    - search
+  theme:
+    - directjude
+_core:
+  default_config_hash: za-39d5WDUg6XvbyqSnuVYEeq6QM4qKJxW8MnoAha5A
+id: directjude_search
+theme: directjude
+region: sidebar_first
+weight: -1
+provider: null
+plugin: search_form_block
+settings:
+  id: search_form_block
+  label: Search
+  provider: search
+  label_display: visible
+visibility: {  }

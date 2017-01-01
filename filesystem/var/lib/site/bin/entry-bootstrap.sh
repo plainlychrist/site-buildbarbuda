@@ -275,8 +275,15 @@ drush -y pm-enable advagg
 echo Enabling the Bootstrap base theme ...
 drush -y pm-enable bootstrap
 
-echo Enabling the DirectJude sub theme ...
+echo 'Setting Bartik as the default theme to retrigger theme installation (hack)'
+drush -y cset system.theme default bartik
+
+echo Reinstalling the DirectJude sub theme ...
+drush -y pm-uninstall directjude
 drush -y pm-enable directjude
+
+echo Setting DirectJude as the default theme, which is our desired theme
+drush -y cset system.theme default directjude
 
 echo Enabling the Loadbalancing cookie
 drush -y pm-enable loadbalancing_cookie

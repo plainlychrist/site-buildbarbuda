@@ -1,0 +1,22 @@
+uuid: 06fd6987-13ce-46c3-a300-c63a053dfaf1
+langcode: en
+status: true
+dependencies:
+  module:
+    - help
+  theme:
+    - directjude
+_core:
+  default_config_hash: 8I8iACSa0sKO3k3jlvUG1ge52rfcKX7USJAQYnzuBgg
+id: directjude_help
+theme: directjude
+region: content
+weight: -30
+provider: null
+plugin: help_block
+settings:
+  id: help_block
+  label: Help
+  provider: help
+  label_display: '0'
+visibility: {  }
