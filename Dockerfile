@@ -1,7 +1,7 @@
 # Writing Guidelines: https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/
 # vim: set tabstop=4 shiftwidth=4 expandtab :
 
-FROM drupal:8.2.3-fpm
+FROM drupal:8.2.4-fpm
 
 MAINTAINER Jonah.Beckford@plainlychrist.org
 
