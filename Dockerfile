@@ -38,6 +38,7 @@ ENV NPS_VERSION 1.11.33.4
 # Install git so that Composer, when fetching dev dependencies, can do a 'git clone'
 # Install a database client, which is used by 'drush up' and 'drush sql-dump'
 #   mysql-client or sqlite3
+# Install ruby for 'gem install sass'
 # Install self-signed SSL (auto-generated) for HTTPS
 # Install supervisor so we can run multiple processes in one container
 RUN apt-get -y update
@@ -45,9 +46,11 @@ RUN apt-get -y install \
         gawk \
         git \
         mysql-client \
+        ruby \
         sqlite3 \
         ssl-cert openssl-blacklist \
         supervisor
+RUN gem install sass
 
 ############## Nginx 1.11.5
 # - skips installing nginx-module-*
@@ -210,7 +213,26 @@ RUN rm -f /usr/local/etc/php-fpm.d/zz-docker.conf
 # Initial configuration for the 'all' site ...
 
 COPY filesystem/var/www/html/sites/all/modules/ /var/www/html/sites/all/modules
-RUN chown -R www-data:www-data /var/www/html/sites/all/modules
+COPY filesystem/var/www/html/sites/all/themes/ /var/www/html/sites/all/themes
+RUN chown -R www-data:www-data /var/www/html/sites/all/modules /var/www/html/sites/all/themes
+
+# Compile themes
+
+RUN install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/all/themes/directjude/css && \
+        sass \
+             --no-cache \
+            --default-encoding UTF-8 \
+            /var/www/html/sites/all/themes/directjude/sass/style.scss \
+            /var/www/html/sites/all/themes/directjude/css/style.css && \
+        test -e /var/www/html/sites/all/themes/directjude/css/style.css
+
+# Clean up space and unneeded packages (we don't need SASS and hence Ruby anymore)
+
+RUN gem cleanup sass && \
+        apt-get -y remove ruby && \
+        apt-get autoremove -y && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Snippets used to build the settings.php and .htacess
 COPY settings/ /var/lib/site/settings

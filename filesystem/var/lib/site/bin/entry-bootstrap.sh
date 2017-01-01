@@ -275,5 +275,8 @@ drush -y pm-enable advagg
 echo Enabling the Bootstrap base theme ...
 drush -y pm-enable bootstrap
 
+echo Enabling the DirectJude sub theme ...
+drush -y pm-enable directjude
+
 echo Enabling the Loadbalancing cookie
 drush -y pm-enable loadbalancing_cookie
