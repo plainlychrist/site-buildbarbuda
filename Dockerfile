@@ -220,7 +220,7 @@ RUN chown -R www-data:www-data /var/www/html/sites/all/modules /var/www/html/sit
 
 RUN install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/all/themes/directjude/css && \
         sass \
-             --no-cache \
+            --no-cache \
             --default-encoding UTF-8 \
             /var/www/html/sites/all/themes/directjude/sass/style.scss \
             /var/www/html/sites/all/themes/directjude/css/style.css && \

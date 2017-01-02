@@ -8,7 +8,7 @@ First, follow the **eight (8)** instructions on the [Amazon EC2 Container Servic
 Then do these steps:
 ```bash
 docker rm -f site-web # this is fine if this fails
-docker run -d -p 80:80 --name site-web --env WEB_ADMIN_PASSWORD=...make...up...a...password personal/site-web --trust-this-ec2-host
+docker run -d -p 443:443 --name site-web --env WEB_ADMIN_PASSWORD=...make...up...a...password -v ~/site.history:/root/.bash_history plainlychrist/site-web:unstable --trust-this-ec2-host --trust-this-ec2-local-ipv4
 docker logs --follow site-web
 ```
 
