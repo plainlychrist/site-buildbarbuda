@@ -1,4 +1,4 @@
-uuid: 4addea5c-08bb-49ee-ace2-7dfa3069d60c
+uuid: 138518b4-319f-4542-99b0-e7a2856ef2d7
 langcode: en
 status: true
 dependencies:
@@ -9,7 +9,7 @@ _core:
 id: directjude_local_actions
 theme: directjude
 region: content
-weight: -20
+weight: -7
 provider: null
 plugin: local_actions_block
 settings:

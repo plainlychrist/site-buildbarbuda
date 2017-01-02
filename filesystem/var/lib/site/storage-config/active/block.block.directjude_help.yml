@@ -1,4 +1,4 @@
-uuid: 06fd6987-13ce-46c3-a300-c63a053dfaf1
+uuid: 1922335f-bebe-4786-b3f6-56b65b5889e4
 langcode: en
 status: true
 dependencies:
@@ -11,7 +11,7 @@ _core:
 id: directjude_help
 theme: directjude
 region: content
-weight: -30
+weight: -7
 provider: null
 plugin: help_block
 settings:

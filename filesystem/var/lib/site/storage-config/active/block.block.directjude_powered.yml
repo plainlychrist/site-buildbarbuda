@@ -1,6 +1,6 @@
-uuid: 84fa8868-dbe4-49e1-b144-2056c9965122
+uuid: 12e90739-48a6-4aee-8952-e7427ecef598
 langcode: en
-status: true
+status: false
 dependencies:
   module:
     - system
@@ -10,8 +10,8 @@ _core:
   default_config_hash: jQQUUWN2Uxr5qZtc9zcJKBCxpKY8orN1u2HPqYYRQDI
 id: directjude_powered
 theme: directjude
-region: navigation
-weight: 10
+region: '-1'
+weight: -6
 provider: null
 plugin: system_powered_by_block
 settings:

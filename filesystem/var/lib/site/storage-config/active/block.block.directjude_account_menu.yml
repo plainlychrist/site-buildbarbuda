@@ -1,4 +1,4 @@
-uuid: 56d88f32-2b78-4476-9ddc-caea89d19570
+uuid: cf4a6ea5-6625-47c2-ac3a-bc0c30c54f3b
 langcode: en
 status: true
 dependencies:
@@ -12,8 +12,8 @@ _core:
   default_config_hash: DweBpscQZdG0-fHkSpUzdYucrNH45G_KF7Z82V-oyQM
 id: directjude_account_menu
 theme: directjude
-region: navigation
-weight: 0
+region: navigation_collapsible
+weight: -6
 provider: null
 plugin: 'system_menu_block:account'
 settings:

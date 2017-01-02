@@ -1,4 +1,4 @@
-uuid: a6d2ee9f-d281-42bf-b5e6-7590911a811e
+uuid: d2124976-00eb-48b7-b0fb-6510155f01b1
 langcode: en
 status: true
 dependencies:
@@ -9,7 +9,7 @@ _core:
 id: directjude_local_tasks
 theme: directjude
 region: content
-weight: -40
+weight: -7
 provider: null
 plugin: local_tasks_block
 settings:
