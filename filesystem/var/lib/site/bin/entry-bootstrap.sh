@@ -255,6 +255,12 @@ if [[ $USE_SQLITE -eq 1 ]]; then
   chmod 660 "${SQLITE_LOCATION}"
 fi
 
+# Before we enable or uninstall modules (which changes storage-config/active), let's
+# save the configuration so we can re-apply it later
+STORAGE_CONFIG=/var/lib/site/storage-config
+rm -rf /var/lib/site/storage-config/active-original
+cp -rp /var/lib/site/storage-config/active /var/lib/site/storage-config/active-original
+
 # Enable the modules that must be present, regardless of configuration.
 # Note that configuration in active/ will automatically enable any module it refers to, so
 # the modules listed below are only really relevant for a barebones no-configuration system.
@@ -287,3 +293,7 @@ drush -y cset system.theme default directjude
 
 echo Enabling the Loadbalancing cookie
 drush -y pm-enable loadbalancing_cookie
+
+# Now re-apply the configuration (especially for DirectJude sub theme which was uninstalled and reset to default settings)
+cp -p /var/lib/site/storage-config/active-original/* /var/lib/site/storage-config/active
+drush -y entity-updates
