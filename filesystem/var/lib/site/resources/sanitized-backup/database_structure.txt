@@ -423,6 +423,19 @@ CREATE TABLE `file_usage` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `flood` (
+  `fid` int(11) NOT NULL COMMENT 'Unique flood event ID.',
+  `event` varchar(64) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'Name of event (e.g. contact).',
+  `identifier` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'Identifier of the visitor, such as an IP address or hostname.',
+  `timestamp` int(11) NOT NULL DEFAULT '0' COMMENT 'Timestamp of the event.',
+  `expiration` int(11) NOT NULL DEFAULT '0' COMMENT 'Expiration timestamp. Expired events are purged on cron run.',
+  PRIMARY KEY (`fid`),
+  KEY `allow` (`event`,`identifier`,`timestamp`),
+  KEY `purge` (`expiration`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `history` (
   `uid` int(11) NOT NULL DEFAULT '0' COMMENT 'The users.uid that read the node nid.',
   `nid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'The node.nid that was read.',

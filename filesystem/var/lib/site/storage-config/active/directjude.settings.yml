@@ -4,8 +4,11 @@ _core:
 favicon:
   mimetype: image/vnd.microsoft.icon
   path: ''
-  url: 'https://localhost/themes/bootstrap/favicon.ico'
-  use_default: true
+  url: 'https://ec2-52-88-26-25.us-west-2.compute.amazonaws.com/sites/all/themes/directjude/favicon.ico'
+  use_default: false
+schemas:
+  bootstrap: 8000
+  directjude: 8000
 features:
   comment_user_picture: true
   comment_user_verification: true
@@ -15,6 +18,5 @@ logo:
   path: ''
   url: ''
   use_default: true
-schemas:
-  bootstrap: 8000
-  directjude: 8000
+table_responsive: '-1'
+table: ''
