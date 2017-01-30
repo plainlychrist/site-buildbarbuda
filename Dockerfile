@@ -12,18 +12,18 @@ WORKDIR /var/www/html
 # https://hub.docker.com/_/nginx/ 1.11.5
 ENV NGINX_VERSION 1.11.5-1~jessie
 ENV DRUSH_MAJOR_VERSION 8
-ENV VIDEO_EMBED_FIELD_VERSION 8.1
-ENV SYMFONY_INTL_VERSION 3.1
-ENV SYMFONY_FORM_VERSION 3.1
-ENV DRUPAL_NAME_VERSION 8.1
-ENV DRUPAL_ADDRESS_VERSION 8.1
-ENV DRUPAL_WORKBENCH_MODERATION_VERSION 8.1
-ENV DRUPAL_BACKUP_DB_VERSION 8.1
-ENV DRUPAL_ADVAGG 8.2
-ENV DRUPAL_BOOTSTRAP_VERSION 8.3
+ENV VIDEO_EMBED_FIELD_VERSION ^1.4
+ENV SYMFONY_INTL_VERSION ^3.2
+ENV SYMFONY_FORM_VERSION ^3.2
+ENV DRUPAL_WORKBENCH_MODERATION_VERSION ^1.2
+ENV DRUPAL_BACKUP_DB_VERSION ^1.0
+ENV DRUPAL_ADVAGG ^2.0
+ENV DRUPAL_BOOTSTRAP_VERSION ^3.1
 ENV MYSQL2SQLITE_VERSION 1b0b5d610c6090422625a2c58d2c23d2296eab3a
 # This, as of 9/8/2016, is a dev dependency (https://packagist.drupal-composer.org/packages/drupal/security_review#dev-8.x-1.x), which needs 'git clone'
-ENV DRUPAL_SECURITY_REVIEW_VERSION 8.1
+ENV DRUPAL_SECURITY_REVIEW_VERSION 1.x-dev
+ENV DRUPAL_NAME_VERSION 1.x-dev
+ENV DRUPAL_ADDRESS_VERSION 1.x-dev
 
 # https://developers.google.com/speed/pagespeed/module/release_notes
 ENV NPS_VERSION 1.11.33.4
@@ -144,9 +144,7 @@ RUN curl -fsSL "https://getcomposer.org/installer" | php -- --install-dir ~/bin 
         chmod +x ~/bin/composer
 
 # Choose where to install packages from
-RUN \
-        ~/bin/composer config repositories.drupal composer https://packagist.drupal-composer.org && \
-        ~/bin/composer config minimum-stability dev
+RUN ~/bin/composer config repositories.drupal composer https://packages.drupal.org/8
 
 ############# Drush
 
@@ -165,28 +163,31 @@ RUN ~/bin/drush core-status
 # Video embedding (https://www.drupal.org/project/video_embed_field)
 # config_installer: Because of bug https://www.drupal.org/node/1613424, we need this custom install profile
 RUN ~/bin/drush dl config_installer
-RUN ~/bin/composer require "drupal/video_embed_field ~${VIDEO_EMBED_FIELD_VERSION}"
+RUN ~/bin/composer require "drupal/video_embed_field ${VIDEO_EMBED_FIELD_VERSION}"
 
 # Install symfony/intl: commerceguys/addressing suggests installing symfony/intl (to use it as the source of country data)
 # Install symfony/form: commerceguys/addressing suggests installing symfony/form (to generate Symfony address forms)
-# Install name and address fields
-RUN ~/bin/composer require "symfony/intl ~${SYMFONY_INTL_VERSION}" "symfony/form ~${SYMFONY_FORM_VERSION}" \
-    "drupal/name ~${DRUPAL_NAME_VERSION}" "drupal/address ~${DRUPAL_ADDRESS_VERSION}"
+# Install name and address fields (currently not in 'stable' Composer package)
+#RUN ~/bin/composer require "symfony/intl ~${SYMFONY_INTL_VERSION}" "symfony/form ~${SYMFONY_FORM_VERSION}" \
+#    "drupal/name ~${DRUPAL_NAME_VERSION}" "drupal/address ~${DRUPAL_ADDRESS_VERSION}"
 
 # Install Backup and Migrate
 # Install Advanced CSS/JS Aggregation
 # Install security review
 # Install workbench moderation
 RUN ~/bin/composer require \
-        "drupal/backup_db ~${DRUPAL_BACKUP_DB_VERSION}" \
-        "drupal/advagg ~${DRUPAL_ADVAGG}" && \
-    ~/bin/composer require \
-        "drupal/security_review ~${DRUPAL_SECURITY_REVIEW_VERSION}" \
-        "drupal/workbench_moderation ~${DRUPAL_WORKBENCH_MODERATION_VERSION}"
+        "drupal/backup_db ${DRUPAL_BACKUP_DB_VERSION}" \
+        "drupal/advagg ${DRUPAL_ADVAGG}" \
+        "drupal/workbench_moderation ${DRUPAL_WORKBENCH_MODERATION_VERSION}"
 
 # Install Bootstrap base theme
 RUN ~/bin/composer require \
-        "drupal/bootstrap ~${DRUPAL_BOOTSTRAP_VERSION}"
+        "drupal/bootstrap ${DRUPAL_BOOTSTRAP_VERSION}"
+
+# Install non-'stable' ... aka 'dev' ... Composer packages
+RUN ~/bin/composer config minimum-stability dev && \
+    ~/bin/composer require \
+        "drupal/security_review ${DRUPAL_SECURITY_REVIEW_VERSION}"
 
 # Install mysql2sqlite
 RUN curl "https://raw.githubusercontent.com/dumblob/mysql2sqlite/${MYSQL2SQLITE_VERSION}/mysql2sqlite" > ~/bin/mysql2sqlite && \
@@ -212,9 +213,9 @@ RUN rm -f /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Initial configuration for the 'all' site ...
 
-COPY filesystem/var/www/html/sites/all/modules/ /var/www/html/sites/all/modules
-COPY filesystem/var/www/html/sites/all/themes/ /var/www/html/sites/all/themes
+COPY filesystem/var/www/html/ /var/www/html
 RUN chown -R www-data:www-data /var/www/html/sites/all/modules /var/www/html/sites/all/themes
+RUN chown www-data:www-data /var/www/html/*
 
 # Compile themes
 
