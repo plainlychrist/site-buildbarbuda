@@ -67,3 +67,15 @@ That produced `favicons.zip` and the following content for the `head` of each pa
 <meta name="application-name" content="PlainlyChrist">
 <meta name="theme-color" content="#ffc40d">
 ```
+
+# 5 - Main Logo
+
+Using InkScape ...
+
+Make the picture 32x32:
+1. Load `modification-3.svg`
+2. Selected all the objects (Ctrl-A)
+3. Scaled them to Width=32px by Height=32px (Shift-Ctrl-M).
+4. Resized Page to Selection (Shift-Ctrl-R).
+
+The SVG was saved as `modification-5.svg`
