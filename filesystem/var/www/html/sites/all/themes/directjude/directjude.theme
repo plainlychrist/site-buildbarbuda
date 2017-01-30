@@ -1,7 +1,102 @@
 <?php
+// vim: filetype=php expandtab tabstop=2 shiftwidth=2 autoindent smartindent:
 /**
  * @file
  * Bootstrap sub-theme.
  *
  * Place your custom PHP code in this file.
  */
+
+/**
+ * We need to add our favicon.ico flavors (see masters/logo/).
+ *
+ * There is no 'html' plugin, like there are for 'page' http://drupal-bootstrap.org/api/bootstrap/docs%21plugins%21Preprocess.md/group/plugins_preprocess/8
+ * and others. So we do a theme hook.
+ */
+function directjude_preprocess_html(&$variables) {
+
+  // Attach logo tags
+  $logo_tags = array(
+    // <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    'apple-touch-icon' => array(
+      '#type' => 'html_tag',
+      '#tag' => 'link',
+      '#attributes' => array(
+        'rel' => 'apple-touch-icon',
+        'sizes' => '180x180',
+        'href' => '/apple-touch-icon.png',
+      ),
+    ),
+    // <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    'favicon-32x32' => array(
+      '#type' => 'html_tag',
+      '#tag' => 'link',
+      '#attributes' => array(
+        'type' => 'image/png',
+        'rel' => 'icon',
+        'sizes' => '32x32',
+        'href' => '/favicon-32x32.png',
+      ),
+    ),
+    // <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    'favicon-16x16' => array(
+      '#type' => 'html_tag',
+      '#tag' => 'link',
+      '#attributes' => array(
+        'type' => 'image/png',
+        'rel' => 'icon',
+        'sizes' => '16x16',
+        'href' => '/favicon-16x16.png',
+      ),
+    ),
+    // <link rel="manifest" href="/manifest.json">
+    'manifest-json' => array(
+      '#type' => 'html_tag',
+      '#tag' => 'link',
+      '#attributes' => array(
+        'rel' => 'manifest',
+        'href' => '/manifest.json',
+      ),
+    ),
+    // <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    'safari-pinned-tab' => array(
+      '#type' => 'html_tag',
+      '#tag' => 'link',
+      '#attributes' => array(
+        'rel' => 'mask-icon',
+        'href' => '/safari-pinned-tab.svg',
+        'color' => '#5bbad5',
+      ),
+    ),
+    // <meta name="apple-mobile-web-app-title" content="PlainlyChrist">
+    'apple-mobile-web-app-title' => array(
+      '#type' => 'html_tag',
+      '#tag' => 'meta',
+      '#attributes' => array(
+        'name' => 'apple-mobile-web-app-title',
+        'content' => 'PlainlyChrist',
+      ),
+    ),
+    // <meta name="application-name" content="PlainlyChrist">
+    'application-name' => array(
+      '#type' => 'html_tag',
+      '#tag' => 'meta',
+      '#attributes' => array(
+        'name' => 'application-name',
+        'content' => 'PlainlyChrist',
+      ),
+    ),
+    // <meta name="theme-color" content="#ffc40d">
+    'theme-color' => array(
+      '#type' => 'html_tag',
+      '#tag' => 'meta',
+      '#attributes' => array(
+        'name' => 'theme-color',
+        'content' => '#ffc40d',
+      ),
+    ),
+  );
+  foreach ($logo_tags as $key => $value) {
+    $variables['page']['#attached']['html_head'][] = [$value, $key];
+  }
+};

@@ -12,6 +12,45 @@ docker run -d -p 443:443 --name site-web --env WEB_ADMIN_PASSWORD=...make...up..
 docker logs --follow site-web
 ```
 
+## Windows 10 Professional or Enterprise 64-bit
+
+These instructions will not work on Windows 10 Home, or earlier versions of Windows.
+
+* Download and install https://download.docker.com/win/stable/InstallDocker.msi
+* Download and install https://desktop.github.com/
+* Open `GitHub` desktop app, and add a new Repository `https://github.com/plainlychrist/site-web.git` into your `Documents` directory
+* Open `Git Shell` and run the following:
+
+```bash
+cd $HOME/Documents
+git clone https://github.com/plainlychrist/site-web.git
+docker rm -f site-web
+docker run -p 443:443 --name site-web --env WEB_ADMIN_PASSWORD=...make...up...a...password -v $HOME /plainlychrist.site.history:/root/.bash_history plainlychrist/site-web:unstable
+```
+
+You will see your site on https://localhost
+
+### Changing the styling
+
+*NOTE: You will need a Linux machine to build code changes, except for theme (styling) changes*
+
+One terminal for running the website:
+
+```bash
+cd $HOME/Documents/site-web
+docker rm -f site-web
+docker run -p 443:443 --name site-web --env WEB_ADMIN_PASSWORD=...make...up...a...password -v $HOME /plainlychrist.site.history:/root/.bash_history -v $HOME\Documents\site-web\filesystem\var\www\html\sites\all\themes:/var/www/html/sites/all/themes plainlychrist/site-web:unstable
+```
+
+Another website for automatically recompiling the CSS files:
+
+```bash
+cd $HOME/Documents/site-web
+docker exec site-web bash -c 'cd /tmp && chmod -R a+w /var/www/html/sites/all/themes/directjude && s
+ass --default-encoding UTF-8 --debug-info --watch /var/www/html/sites/all/themes/directjude/sass/style.scss:/var/www/html/sites/all/themes/dir
+ectjude/css/style.css'
+```
+
 ## Debugging a failed, stopped container
 
 ```bash

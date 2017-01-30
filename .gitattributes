@@ -6,6 +6,10 @@
 # Drupal files
 *.scss     text eol=lf
 *.yml      text eol=lf
+*.php      text eol=lf
+*.theme    text eol=lf
+
+*.md       text eol=lf
 
 # Custom for Visual Studio
 *.cs     diff=csharp
