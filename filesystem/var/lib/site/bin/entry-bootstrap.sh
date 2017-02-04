@@ -145,6 +145,53 @@ function generate_services_file_config {
   echo '    factory: Drupal\Core\Config\FileStorageFactory::getActive' >> ${SERVICES}
 }
 
+function enable_required_modules {
+  # Before we enable or uninstall modules (which changes storage-config/active), let's
+  # save the configuration so we can re-apply it later
+  STORAGE_CONFIG=/var/lib/site/storage-config
+  if [[ -d /var/lib/site/storage-config/active-original ]]; then
+    rm -rf /var/lib/site/storage-config/active-original
+  fi
+  cp -rp /var/lib/site/storage-config/active /var/lib/site/storage-config/active-original
+
+  # Enable the modules that must be present, regardless of configuration.
+  # Note that configuration in active/ will automatically enable any module it refers to, so
+  # the modules listed below are only really relevant for a barebones no-configuration system.
+  # Basically, Day 1 of the source code.
+
+  echo Enabling the Security Review module ...
+  drush -y pm-enable security_review
+
+  echo Enabling the Update Manager module ...
+  drush -y pm-enable update
+
+  echo Enabling the Backup Database module ...
+  drush -y pm-enable backup_db
+
+  echo Enabling the Advanced CSS JS aggregation module ...
+  drush -y pm-enable advagg
+
+  echo Enabling the Bootstrap base theme ...
+  drush -y pm-enable bootstrap
+
+  echo 'Setting Bartik as the default theme to retrigger theme installation (hack)'
+  drush -y cset system.theme default bartik
+
+  echo Reinstalling the DirectJude sub theme ...
+  drush -y pm-uninstall directjude
+  drush -y pm-enable directjude
+
+  echo Setting DirectJude as the default theme, which is our desired theme
+  drush -y cset system.theme default directjude
+
+  echo Enabling the Loadbalancing cookie
+  drush -y pm-enable loadbalancing_cookie
+
+  # Now re-apply the configuration (especially for DirectJude sub theme which was uninstalled and reset to default settings)
+  cp -p /var/lib/site/storage-config/active-original/* /var/lib/site/storage-config/active
+  drush -y entity-updates
+}
+
 # Use file-based configuration rather than database-base configuration
 # https://www.drupal.org/node/2291587
 
@@ -209,6 +256,9 @@ if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
     # Make sure all entities defined in configuration are present in database
     drush -y entity-updates
 
+    # enable all required modules
+    enable_required_modules
+
     # Reset drupal caches
     drush cache-rebuild
 
@@ -255,45 +305,3 @@ if [[ $USE_SQLITE -eq 1 ]]; then
   chmod 660 "${SQLITE_LOCATION}"
 fi
 
-# Before we enable or uninstall modules (which changes storage-config/active), let's
-# save the configuration so we can re-apply it later
-STORAGE_CONFIG=/var/lib/site/storage-config
-rm -rf /var/lib/site/storage-config/active-original
-cp -rp /var/lib/site/storage-config/active /var/lib/site/storage-config/active-original
-
-# Enable the modules that must be present, regardless of configuration.
-# Note that configuration in active/ will automatically enable any module it refers to, so
-# the modules listed below are only really relevant for a barebones no-configuration system.
-# Basically, Day 1 of the source code.
-
-echo Enabling the Security Review module ...
-drush -y pm-enable security_review
-
-echo Enabling the Update Manager module ...
-drush -y pm-enable update
-
-echo Enabling the Backup Database module ...
-drush -y pm-enable backup_db
-
-echo Enabling the Advanced CSS JS aggregation module ...
-drush -y pm-enable advagg
-
-echo Enabling the Bootstrap base theme ...
-drush -y pm-enable bootstrap
-
-echo 'Setting Bartik as the default theme to retrigger theme installation (hack)'
-drush -y cset system.theme default bartik
-
-echo Reinstalling the DirectJude sub theme ...
-drush -y pm-uninstall directjude
-drush -y pm-enable directjude
-
-echo Setting DirectJude as the default theme, which is our desired theme
-drush -y cset system.theme default directjude
-
-echo Enabling the Loadbalancing cookie
-drush -y pm-enable loadbalancing_cookie
-
-# Now re-apply the configuration (especially for DirectJude sub theme which was uninstalled and reset to default settings)
-cp -p /var/lib/site/storage-config/active-original/* /var/lib/site/storage-config/active
-drush -y entity-updates

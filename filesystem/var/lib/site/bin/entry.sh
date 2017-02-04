@@ -109,6 +109,8 @@ fi
 # Install drupal, specifically sites/default/settings.php
 if drush core-status drupal-settings-file | grep MISSING; then
   source /var/lib/site/bin/entry-bootstrap.sh
+else
+  echo "Skipped bootstrapping because 'drush core-status drupal-settings-file' does not report MISSING"
 fi
 
 # https://www.drupal.org/node/244924
