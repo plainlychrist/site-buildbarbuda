@@ -7,7 +7,7 @@ Your typical workflow would be:
 3. Log into your newly running website. Do whatever web site content changes you want (if any).
 4. Run any pending upgrades (usually from a Drupal security update that was autobuilt on GitHub) by going to https://your_new_site/update.php
 5. Run the **security review checklist** by going to https://your_new_site/admin/reports/security-review and clicking `Run > Run checklist`
-6. [Upgrade the configuration](../UPGRADING-CONFIG,md), but stop at the `git commit` step
+6. [Upgrade the configuration](../UPGRADING-CONFIG.md), but stop at the `git commit` step
 7. Go into your `site-web` directory (where you can do `git` commands). Verify by running `git remote -v` and make sure you see `https://github.com/plainlychrist/site-web.git`
 8. Run `docker exec -it siteec2linuxdesktop_web_1 /home/drupaladmin/bin/drush cr`. Then run `docker exec -it siteec2linuxdesktop_web_1 runuser -u www-data /var/lib/site/bin/sanitized-backup.sh`. **If it fails** with a bunch of SQL statements after `Comparing /var/lib/site/resources/sanitized-backup/database_structure.txt against the output` or does not say `COMPLETE: Done`, then you must:
     * Decide whether the database changes (you may have had an Drupal security update, or you may have installed a new module) are what you wanted. If they are not, **start over**.
