@@ -120,6 +120,20 @@ CREATE TABLE `block_content_revision__body` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cache_advagg` (
+  `cid` varchar(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '' COMMENT 'Primary Key: Unique cache ID.',
+  `data` longblob COMMENT 'A collection of data to cache.',
+  `expire` int(11) NOT NULL DEFAULT '0' COMMENT 'A Unix timestamp indicating when the cache entry should expire, or -1 for never.',
+  `created` decimal(14,3) NOT NULL DEFAULT '0.000' COMMENT 'A timestamp with millisecond precision indicating when the cache entry was created.',
+  `serialized` smallint(6) NOT NULL DEFAULT '0' COMMENT 'A flag to indicate whether content is serialized (1) or not (0).',
+  `tags` longtext COMMENT 'Space-separated list of cache tags for this entry.',
+  `checksum` varchar(255) CHARACTER SET ascii NOT NULL COMMENT 'The tag invalidation checksum when this entry was saved.',
+  PRIMARY KEY (`cid`),
+  KEY `expire` (`expire`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cache_advagg_minify` (
   `cid` varchar(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '' COMMENT 'Primary Key: Unique cache ID.',
   `data` longblob COMMENT 'A collection of data to cache.',
@@ -246,9 +260,6 @@ CREATE TABLE `cache_entity` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cache_menu` (
   `cid` varchar(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '' COMMENT 'Primary Key: Unique cache ID.',
   `data` longblob COMMENT 'A collection of data to cache.',
@@ -359,19 +370,20 @@ CREATE TABLE `comment_field_data` (
   `hostname` varchar(128) DEFAULT NULL,
   `created` int(11) NOT NULL,
   `changed` int(11) DEFAULT NULL,
-  `status` tinyint(4) DEFAULT NULL,
   `thread` varchar(255) NOT NULL,
   `entity_type` varchar(32) CHARACTER SET ascii DEFAULT NULL,
   `field_name` varchar(32) CHARACTER SET ascii DEFAULT NULL,
   `default_langcode` tinyint(4) NOT NULL,
+  `status` tinyint(4) NOT NULL,
   PRIMARY KEY (`cid`,`langcode`),
   KEY `comment__id__default_langcode__langcode` (`cid`,`default_langcode`,`langcode`),
   KEY `comment_field__comment_type__target_id` (`comment_type`),
   KEY `comment_field__uid__target_id` (`uid`),
   KEY `comment_field__created` (`created`),
+  KEY `comment__entity_langcode` (`entity_id`,`entity_type`,`comment_type`,`default_langcode`),
+  KEY `comment__status_comment_type` (`status`,`comment_type`,`cid`),
   KEY `comment__status_pid` (`pid`,`status`),
-  KEY `comment__num_new` (`entity_id`,`entity_type`,`comment_type`,`status`,`created`,`cid`,`thread`(191)),
-  KEY `comment__entity_langcode` (`entity_id`,`entity_type`,`comment_type`,`default_langcode`)
+  KEY `comment__num_new` (`entity_id`,`entity_type`,`comment_type`,`status`,`created`,`cid`,`thread`(191))
 );
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -618,7 +630,7 @@ CREATE TABLE `node__field_tags` (
 CREATE TABLE `node_access` (
   `nid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'The node.nid this record affects.',
   `langcode` varchar(12) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language.langcode of this node.',
-  `fallback` int(10) unsigned NOT NULL DEFAULT '1' COMMENT 'Boolean indicating whether this record should be used as a fallback if a language condition is not provided.',
+  `fallback` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT 'Boolean indicating whether this record should be used as a fallback if a language condition is not provided.',
   `gid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'The grant ID a user must possess in the specified realm to gain this row''s privileges on the node.',
   `realm` varchar(255) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The realm in which the user must possess the grant ID. Each node access node can define one or more realms.',
   `grant_view` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Boolean indicating whether a user with the realm/grant pair can view this node.',
