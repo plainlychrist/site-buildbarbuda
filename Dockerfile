@@ -15,23 +15,20 @@ WORKDIR /var/www/html
 
 ############# Versions
 
-# NGINX: https://hub.docker.com/_/nginx/ 1.13.5
+# NGINX: https://hub.docker.com/_/nginx/ 1.13.3
 # DRUPAL_SECURITY_REVIEW: as of 9/8/2016, is a dev dependency (https://packagist.drupal-composer.org/packages/drupal/security_review#dev-8.x-1.x), which needs 'git clone'
 # NPS: https://developers.google.com/speed/pagespeed/module/release_notes
-ENV NGINX_VERSION="1.13.5-1~jessie" \
+ENV NGINX_VERSION="1.13.3-1~jessie" \
     DRUSH_MAJOR_VERSION="8" \
-    VIDEO_EMBED_FIELD_VERSION="^1.4" \
-    SYMFONY_INTL_VERSION="^3.2" \
-    SYMFONY_FORM_VERSION="^3.2" \
+    VIDEO_EMBED_FIELD_VERSION="^1.5" \
     DRUPAL_WORKBENCH_MODERATION_VERSION="^1.2" \
-    DRUPAL_BACKUP_DB_VERSION="^1.0" \
-    DRUPAL_ADVAGG_VERSION="^2.0" \
-    DRUPAL_BOOTSTRAP_VERSION="^3.1" \
+    DRUPAL_BACKUP_DB_VERSION="^1.2" \
+    DRUPAL_ADVAGG_VERSION="^3.2" \
+    DRUPAL_BOOTSTRAP_VERSION="^3.5" \
     MYSQL2SQLITE_VERSION="1b0b5d610c6090422625a2c58d2c23d2296eab3a" \
-    DRUPAL_SECURITY_REVIEW_VERSION="1.x-dev" \
-    DRUPAL_NAME_VERSION="1.x-dev" \
-    DRUPAL_ADDRESS_VERSION="1.x-dev" \
-    NPS_VERSION="1.11.33.4"
+    DRUPAL_SECURITY_REVIEW_VERSION="^1.3" \
+    NPS_VERSION="1.12.34.2" \
+    NPS_STREAM="stable"
 
 ########################
 ######## ROOT ##########
@@ -79,27 +76,31 @@ EXPOSE 80 443
 #    https://developers.google.com/speed/pagespeed/module/build_ngx_pagespeed_from_source
 ##########
 
-RUN apt-get install --no-install-recommends --no-install-suggests -y build-essential zlib1g-dev libpcre3 libpcre3-dev unzip \
-  && set -x \
+RUN apt-get install --no-install-recommends --no-install-suggests -y build-essential zlib1g-dev libpcre3 libpcre3-dev unzip libssl-dev
+RUN set -x \
   && cd \
   && NGINX_VERSION=$(nginx -v 2>&1 | sed 's#.*/##') \
   && PS_NGX_EXTRA_FLAGS=$(nginx -V 2>&1 | awk '/configure arguments:/{$1=""; $2=""; print}') \
-  && curl -LO https://github.com/pagespeed/ngx_pagespeed/archive/release-${NPS_VERSION}-beta.zip \
-  && unzip release-${NPS_VERSION}-beta.zip  \
-  && cd ngx_pagespeed-release-${NPS_VERSION}-beta/  \
-  && curl -LO https://dl.google.com/dl/page-speed/psol/${NPS_VERSION}.tar.gz  \
-  && tar -xzvf ${NPS_VERSION}.tar.gz  \
+  && curl -LO https://github.com/pagespeed/ngx_pagespeed/archive/v${NPS_VERSION}-${NPS_STREAM}.zip \
+  && unzip v${NPS_VERSION}-${NPS_STREAM}.zip  \
+  && cd ngx_pagespeed-${NPS_VERSION}-${NPS_STREAM}/ \
+  && psol_url=https://dl.google.com/dl/page-speed/psol/${NPS_VERSION}-${NPS_STREAM}.tar.gz \
+  && [ -e scripts/format_binary_url.sh ] && psol_url=$(scripts/format_binary_url.sh PSOL_BINARY_URL) \
+  && curl -LO ${psol_url} \
+  && echo curl -LO https://dl.google.com/dl/page-speed/psol/${NPS_VERSION}.tar.gz  \
+  && echo tar -xzvf ${NPS_VERSION}.tar.gz  \
+  && tar -xzvf $(basename ${psol_url}) \
   && cd  \
   && curl -LO http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz  \
-  && tar -xvzf nginx-${NGINX_VERSION}.tar.gz  \
+  && tar -xvzf nginx-${NGINX_VERSION}.tar.gz \
   && cd nginx-${NGINX_VERSION}/  \
-  && echo ./configure --add-dynamic-module=$HOME/ngx_pagespeed-release-${NPS_VERSION}-beta $PS_NGX_EXTRA_FLAGS > /tmp/runit  \
+  && echo ./configure --add-dynamic-module=$HOME/ngx_pagespeed-${NPS_VERSION}-${NPS_STREAM} $PS_NGX_EXTRA_FLAGS > /tmp/runit  \
   && sh /tmp/runit  \
   && rm /tmp/runit \
   && make \
   && install -pv ./objs/ngx_pagespeed.so /etc/nginx/modules/  \
   && cd \
-  && rm -rf release-${NPS_VERSION}-beta.zip ngx_pagespeed-release-${NPS_VERSION}-beta/ nginx-${NGINX_VERSION}.tar.gz nginx-${NGINX_VERSION}/ \
+  && rm -rf release-${NPS_VERSION}-${NPS_STREAM}.zip ngx_pagespeed-release-${NPS_VERSION}-${NPS_STREAM}/ nginx-${NGINX_VERSION}.tar.gz nginx-${NGINX_VERSION}/ \
   && apt-get remove -y build-essential zlib1g-dev libpcre3-dev unzip
 
 # Clean up space and unneeded packages
@@ -170,12 +171,6 @@ RUN ~/bin/drush core-status
 RUN ~/bin/drush dl config_installer
 RUN ~/bin/composer require "drupal/video_embed_field ${VIDEO_EMBED_FIELD_VERSION}"
 
-# Install symfony/intl: commerceguys/addressing suggests installing symfony/intl (to use it as the source of country data)
-# Install symfony/form: commerceguys/addressing suggests installing symfony/form (to generate Symfony address forms)
-# Install name and address fields (currently not in 'stable' Composer package)
-#RUN ~/bin/composer require "symfony/intl ~${SYMFONY_INTL_VERSION}" "symfony/form ~${SYMFONY_FORM_VERSION}" \
-#    "drupal/name ~${DRUPAL_NAME_VERSION}" "drupal/address ~${DRUPAL_ADDRESS_VERSION}"
-
 # Install Backup and Migrate
 # Install Advanced CSS/JS Aggregation
 # Install security review
@@ -183,16 +178,12 @@ RUN ~/bin/composer require "drupal/video_embed_field ${VIDEO_EMBED_FIELD_VERSION
 RUN ~/bin/composer require \
         "drupal/backup_db ${DRUPAL_BACKUP_DB_VERSION}" \
         "drupal/advagg ${DRUPAL_ADVAGG_VERSION}" \
+        "drupal/security_review ${DRUPAL_SECURITY_REVIEW_VERSION}" \
         "drupal/workbench_moderation ${DRUPAL_WORKBENCH_MODERATION_VERSION}"
 
 # Install Bootstrap base theme
 RUN ~/bin/composer require \
         "drupal/bootstrap ${DRUPAL_BOOTSTRAP_VERSION}"
-
-# Install non-'stable' ... aka 'dev' ... Composer packages
-RUN ~/bin/composer config minimum-stability dev && \
-    ~/bin/composer require \
-        "drupal/security_review ${DRUPAL_SECURITY_REVIEW_VERSION}"
 
 # Install mysql2sqlite
 RUN curl "https://raw.githubusercontent.com/dumblob/mysql2sqlite/${MYSQL2SQLITE_VERSION}/mysql2sqlite" > ~/bin/mysql2sqlite && \
