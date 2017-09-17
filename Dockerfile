@@ -4,7 +4,7 @@
 # * https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/
 # * http://docs.projectatomic.io/container-best-practices/#
 
-FROM drupal:8.2.5-fpm
+FROM drupal:8.3-fpm
 
 LABEL name="plainlychrist/site-web" \
       version="1.0"
@@ -15,10 +15,10 @@ WORKDIR /var/www/html
 
 ############# Versions
 
-# NGINX: https://hub.docker.com/_/nginx/ 1.11.5
+# NGINX: https://hub.docker.com/_/nginx/ 1.13.5
 # DRUPAL_SECURITY_REVIEW: as of 9/8/2016, is a dev dependency (https://packagist.drupal-composer.org/packages/drupal/security_review#dev-8.x-1.x), which needs 'git clone'
 # NPS: https://developers.google.com/speed/pagespeed/module/release_notes
-ENV NGINX_VERSION="1.11.5-1~jessie" \
+ENV NGINX_VERSION="1.13.5-1~jessie" \
     DRUSH_MAJOR_VERSION="8" \
     VIDEO_EMBED_FIELD_VERSION="^1.4" \
     SYMFONY_INTL_VERSION="^3.2" \
@@ -57,7 +57,7 @@ RUN apt-get -y update && \
         supervisor && \
     gem install sass
 
-############## Nginx 1.11.5
+############## Nginx 1.13.5
 # - skips installing nginx-module-*
 # - skips remove /var/lib/apt/lists/*
 
