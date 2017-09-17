@@ -1,14 +1,12 @@
-# What is plainlychrist/site-web?
+# What is plainlychrist/site-buildbarbuda?
 
-`site-web` is the website for PlainlyChrist.org. The website is a [Drupal 8](https://www.drupal.org/) content management system (CMS). CMS's, like `site-web`, allow many different people to edit the content on a website.
+`site-buildbarbuda` is the website for BuildBarbuda.org. The website is a [Drupal 8](https://www.drupal.org/) content management system (CMS). CMS's, like `site-buildbarbuda`, allow many different people to edit the content on a website.
 
-# Design Principles
+Since it fit the service mission of plainlychrist.org, the site started as a clone of plainlychrist.org and shared hosting resources.
 
-The main design principle for PlainlyChrist.org is to be transparent.
+# Design
 
-* **Open-source**: All the logic (the code and configuration) is fully open-source, with a truly unrestrictive license (Apache v2.0). That means you don't have to pay anybody or sign contracts to examine what we are doing.
-* **Open-data**: All the content (the text and the links) is fully open data. That means you don't have to pay anybody or sign contracts to see what information we use.
-* **Reproducible**: Anybody with a modern computer can create a full copy of the existing website. That means if you dislike what PlainlyChrist.org is doing, you have the freedom to start your own I-Want-Something-Better-Than-PlainlyChrist.org.
+This website shares the same structure as plainlychrist.org; at the launch of BuildBarbuda.org the plainlychrist.org website had not launched, but most of its hosting code was present. Both sites share a collaborative focus (plainlychrist.org for Christians; buildbarbuda.com for Barbudans) so the technical base (especially the choice of Drupal) makes sense.
 
 # Policies
 

@@ -71,7 +71,7 @@ function generate_settings {
   max_index=$((n_elements - 1))
   if [[ $n_elements -gt 0 ]]; then
     echo
-    echo '# Installed by site-web entry-bootstrap.sh from "docker run ... -t ..."'
+    echo '# Installed by site-buildbarbuda entry-bootstrap.sh from "docker run ... -t ..."'
     echo '$settings["trusted_host_patterns"] = array('
     for ((i = 0; i <= max_index; i++)); do
       echo "'${TRUSTED_HOST_PATTERNS[i]}',"
@@ -124,7 +124,7 @@ EOF
 
 function generate_settings_file_config {
   echo
-  echo '# Installed by site-web entry-bootstrap.sh'
+  echo '# Installed by site-buildbarbuda entry-bootstrap.sh'
   echo "\$settings['bootstrap_config_storage'] = array('Drupal\Core\Config\BootstrapConfigStorageFactory', 'getFileStorage');"
   echo "\$config_directories = array(
      CONFIG_ACTIVE_DIRECTORY => '${STORAGE_CONFIG}/active/',
@@ -135,7 +135,7 @@ function generate_settings_file_config {
 
 function generate_services_file_config {
   echo >> ${SERVICES}
-  echo '# Installed by site-web entry-bootstrap.sh' >> ${SERVICES}
+  echo '# Installed by site-buildbarbuda entry-bootstrap.sh' >> ${SERVICES}
   echo 'services:' >> ${SERVICES}
   echo '  config.storage:' >> ${SERVICES}
   echo '    class: Drupal\Core\Config\CachedStorage' >> ${SERVICES}
@@ -292,9 +292,9 @@ else
   drush -y site-install --db-url="${DB_URL}" \
     --account-name=admin \
     --account-pass="${WEB_ADMIN_PASSWORD}" \
-    --account-mail=no-reply@plainlychrist.org \
-    --site-name="PlainlyChrist.org" \
-    --site-mail=no-reply@plainlychrist.org \
+    --account-mail=no-reply@buildbarbuda.org \
+    --site-name="BuildBarbuda.org" \
+    --site-mail=no-reply@buildbarbuda.org \
     --verbose \
     standard install_configure_form.update_status_module='array(FALSE,FALSE)'
 fi

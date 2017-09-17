@@ -6,7 +6,7 @@
 
 FROM drupal:8.3-fpm
 
-LABEL name="plainlychrist/site-web" \
+LABEL name="plainlychrist/site-buildbarbuda" \
       version="1.0"
 
 MAINTAINER Jonah.Beckford@plainlychrist.org
