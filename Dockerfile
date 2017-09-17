@@ -1,7 +1,13 @@
-# Writing Guidelines: https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/
 # vim: set tabstop=4 shiftwidth=4 expandtab :
 
+# Writing Guidelines:
+# * https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/
+# * http://docs.projectatomic.io/container-best-practices/#
+
 FROM drupal:8.2.5-fpm
+
+LABEL name="plainlychrist/site-web" \
+      version="1.0"
 
 MAINTAINER Jonah.Beckford@plainlychrist.org
 
@@ -9,24 +15,23 @@ WORKDIR /var/www/html
 
 ############# Versions
 
-# https://hub.docker.com/_/nginx/ 1.11.5
-ENV NGINX_VERSION 1.11.5-1~jessie
-ENV DRUSH_MAJOR_VERSION 8
-ENV VIDEO_EMBED_FIELD_VERSION ^1.4
-ENV SYMFONY_INTL_VERSION ^3.2
-ENV SYMFONY_FORM_VERSION ^3.2
-ENV DRUPAL_WORKBENCH_MODERATION_VERSION ^1.2
-ENV DRUPAL_BACKUP_DB_VERSION ^1.0
-ENV DRUPAL_ADVAGG ^2.0
-ENV DRUPAL_BOOTSTRAP_VERSION ^3.1
-ENV MYSQL2SQLITE_VERSION 1b0b5d610c6090422625a2c58d2c23d2296eab3a
-# This, as of 9/8/2016, is a dev dependency (https://packagist.drupal-composer.org/packages/drupal/security_review#dev-8.x-1.x), which needs 'git clone'
-ENV DRUPAL_SECURITY_REVIEW_VERSION 1.x-dev
-ENV DRUPAL_NAME_VERSION 1.x-dev
-ENV DRUPAL_ADDRESS_VERSION 1.x-dev
-
-# https://developers.google.com/speed/pagespeed/module/release_notes
-ENV NPS_VERSION 1.11.33.4
+# NGINX: https://hub.docker.com/_/nginx/ 1.11.5
+# DRUPAL_SECURITY_REVIEW: as of 9/8/2016, is a dev dependency (https://packagist.drupal-composer.org/packages/drupal/security_review#dev-8.x-1.x), which needs 'git clone'
+# NPS: https://developers.google.com/speed/pagespeed/module/release_notes
+ENV NGINX_VERSION="1.11.5-1~jessie" \
+    DRUSH_MAJOR_VERSION="8" \
+    VIDEO_EMBED_FIELD_VERSION="^1.4" \
+    SYMFONY_INTL_VERSION="^3.2" \
+    SYMFONY_FORM_VERSION="^3.2" \
+    DRUPAL_WORKBENCH_MODERATION_VERSION="^1.2" \
+    DRUPAL_BACKUP_DB_VERSION="^1.0" \
+    DRUPAL_ADVAGG_VERSION="^2.0" \
+    DRUPAL_BOOTSTRAP_VERSION="^3.1" \
+    MYSQL2SQLITE_VERSION="1b0b5d610c6090422625a2c58d2c23d2296eab3a" \
+    DRUPAL_SECURITY_REVIEW_VERSION="1.x-dev" \
+    DRUPAL_NAME_VERSION="1.x-dev" \
+    DRUPAL_ADDRESS_VERSION="1.x-dev" \
+    NPS_VERSION="1.11.33.4"
 
 ########################
 ######## ROOT ##########
@@ -38,19 +43,19 @@ ENV NPS_VERSION 1.11.33.4
 # Install git so that Composer, when fetching dev dependencies, can do a 'git clone'
 # Install a database client, which is used by 'drush up' and 'drush sql-dump'
 #   mysql-client or sqlite3
-# Install ruby for 'gem install sass'
+# Install ruby and ruby-dev for 'gem install sass'
 # Install self-signed SSL (auto-generated) for HTTPS
 # Install supervisor so we can run multiple processes in one container
-RUN apt-get -y update
-RUN apt-get -y install \
+RUN apt-get -y update && \
+    apt-get -y install \
         gawk \
         git \
         mysql-client \
-        ruby \
+        ruby ruby-dev \
         sqlite3 \
         ssl-cert openssl-blacklist \
-        supervisor
-RUN gem install sass
+        supervisor && \
+    gem install sass
 
 ############## Nginx 1.11.5
 # - skips installing nginx-module-*
@@ -177,7 +182,7 @@ RUN ~/bin/composer require "drupal/video_embed_field ${VIDEO_EMBED_FIELD_VERSION
 # Install workbench moderation
 RUN ~/bin/composer require \
         "drupal/backup_db ${DRUPAL_BACKUP_DB_VERSION}" \
-        "drupal/advagg ${DRUPAL_ADVAGG}" \
+        "drupal/advagg ${DRUPAL_ADVAGG_VERSION}" \
         "drupal/workbench_moderation ${DRUPAL_WORKBENCH_MODERATION_VERSION}"
 
 # Install Bootstrap base theme
@@ -229,7 +234,7 @@ RUN install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/all/themes/
 
 # Clean up space and unneeded packages (we don't need SASS and hence Ruby anymore)
 
-RUN gem cleanup sass && \
+RUN gem cleanup all && \
         apt-get -y remove ruby && \
         apt-get autoremove -y && \
         apt-get clean && \
