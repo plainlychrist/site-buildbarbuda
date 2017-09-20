@@ -40,15 +40,21 @@ ENV NGINX_VERSION="1.13.3-1~jessie" \
 # Install git so that Composer, when fetching dev dependencies, can do a 'git clone'
 # Install a database client, which is used by 'drush up' and 'drush sql-dump'
 #   mysql-client or sqlite3
+# Install postfix and libsasl2-modules and rsyslog for mail delivery
 # Install ruby and ruby-dev for 'gem install sass'
 # Install self-signed SSL (auto-generated) for HTTPS
 # Install supervisor so we can run multiple processes in one container
 RUN apt-get -y update && \
+    echo "postfix postfix/mailname string replaceme.hostname.com" | debconf-set-selections && \
+    echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && \
     apt-get -y install \
         gawk \
         git \
+        libsasl2-modules \
         mysql-client \
+        rsyslog \
         ruby ruby-dev \
+        postfix \
         sqlite3 \
         ssl-cert openssl-blacklist \
         supervisor && \

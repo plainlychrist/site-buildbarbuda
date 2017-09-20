@@ -12,6 +12,7 @@ function usage()
     echo "--trust-this-ec2-host           Add the public DNS name of this EC2 host as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
     echo "--trust-this-ec2-local-ipv4     Add the local IP4 address of this EC2 host, used by AWS ELB for health checks, as a trusted host pattern, as per https://www.drupal.org/node/1992030" >&2
     echo "-m|--use-mysql                  Use MySQL. Expects the MYSQL_PASSWORD environment variable to be set. MYSQL_DATABASE, MYSQL_USER, MYSQL_HOST and MYSQL_PORT are optional, and default to 'drupal', 'drupal', 'db' and '3306', respectively, for convenience with Docker links" >&2
+    echo "-p|--use-postfix                Use Postfix with TLS and SASL security. Expects the POSTFIX_DOMAIN, POSTFIX_RELAY_HOST, POSTFIX_USER, POSTFIX_PASSWORD environment variables to be set. POSTFIX_RELAY_PORT, POSTFIX_SASL_SECURITY_OPTIONS, and POSTFIX_SASL_TLS_SECURITY_OPTIONS are optional, and default to 587, 'noanonymous,noplaintext' and 'noanonymous', respectively. Typically POSTFIX_DOMAIN is your email domain (the part after the @ in your email address), and POSTFIX_USER is the full email address of whoever is allowed to send out emails, and POSTFIX_RELAY_HOST is the name of your SMTP server" >&2
     echo "-b|--bootstrap WEBSITE_URL      Bootstrap the data from a live website. This will fetch the latest available snapshot of the data, and only a sanitized (the users are stripped of identifying information) version of that data. The WEBSITE_URL can be https://buildbarbuda.org; you MUST TRUST the site as the site will have the ability to install arbitrary code on your site. The bootstrapping will only occur if there is no data yet on your site. The live data is from a MySQL database, and is automatically converted to SQLite if you are not using MySQL yourself; that conversion is not perfect, so using MySQL is recommended" >&2
     echo "--no-op                         This option will be ignored, and is only needed as a placeholder for automated tools that call this script" >&2
 }
@@ -24,6 +25,7 @@ function drush()
 # process command line
 TRUSTED_HOST_PATTERNS=()
 USE_MYSQL=0
+USE_POSTFIX=0
 BOOTSTRAP_URL=""
 HASH_SALT=""
 while [[ $# -gt 0 ]]; do
@@ -37,6 +39,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     -m|--use-mysql)
       USE_MYSQL=1
+      shift
+      ;;
+    -p|--use-postfix)
+      USE_POSTFIX=1
       shift
       ;;
     --hash-salt)
@@ -111,6 +117,25 @@ if drush core-status drupal-settings-file | grep MISSING; then
   source /var/lib/site/bin/entry-bootstrap.sh
 else
   echo "Skipped bootstrapping because 'drush core-status drupal-settings-file' does not report MISSING"
+fi
+
+# http://www.postfix.org/SASL_README.html#client_sasl
+echo Configuring postfix for emails ...
+cp /etc/resolv.conf /var/spool/postfix/etc/resolv.conf
+if [[ $USE_POSTFIX -eq 1 ]]; then
+  POSTFIX_SASL_SECURITY_OPTIONS=${POSTFIX_SASL_SECURITY_OPTIONS:-noanonymous,noplaintext}
+  POSTFIX_SASL_TLS_SECURITY_OPTIONS=${POSTFIX_SASL_TLS_SECURITY_OPTIONS:-noanonymous}
+  POSTFIX_RELAY_PORT=${POSTFIX_RELAY_PORT:-587}
+  postconf -e smtp_use_tls=yes
+  postconf -e mydomain="${POSTFIX_DOMAIN}"
+  postconf -e myorigin="${POSTFIX_DOMAIN}"
+  postconf -e "relayhost=[${POSTFIX_RELAY_HOST}]:${POSTFIX_RELAY_PORT}"
+  postconf -e smtp_sasl_auth_enable=yes
+  postconf -e smtp_sasl_password_maps=hash:/etc/postfix/sasl_passwd
+  postconf -e smtp_sasl_security_options="${POSTFIX_SASL_SECURITY_OPTIONS}"
+  postconf -e smtp_sasl_tls_security_options="${POSTFIX_SASL_TLS_SECURITY_OPTIONS}"
+  echo "[${POSTFIX_RELAY_HOST}]:${POSTFIX_RELAY_PORT} ${POSTFIX_USER}:${POSTFIX_PASSWORD}" > /etc/postfix/sasl_passwd
+  postmap /etc/postfix/sasl_passwd
 fi
 
 # https://www.drupal.org/node/244924
