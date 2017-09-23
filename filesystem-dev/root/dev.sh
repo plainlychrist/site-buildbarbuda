@@ -35,3 +35,10 @@ if [[ ! -e bin/drupal ]]; then
   chown drupaladmin bin/drupal.phar
   mv bin/drupal.phar bin/drupal
 fi
+
+# Just use Drupal Console to install (easier than composer( ...
+cd /var/www/html
+
+# Install Devel
+runuser -s /bin/bash -c '/home/drupaladmin/bin/drupal module:install devel --latest' drupaladmin
+runuser -s /bin/bash -c '/home/drupaladmin/bin/drupal module:install masquerade --latest' drupaladmin

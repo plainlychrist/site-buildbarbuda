@@ -20,15 +20,23 @@ WORKDIR /var/www/html
 # NPS: https://developers.google.com/speed/pagespeed/module/release_notes
 ENV NGINX_VERSION="1.13.3-1~jessie" \
     DRUSH_MAJOR_VERSION="8" \
-    VIDEO_EMBED_FIELD_VERSION="^1.5" \
-    DRUPAL_WORKBENCH_MODERATION_VERSION="^1.2" \
-    DRUPAL_BACKUP_DB_VERSION="^1.2" \
-    DRUPAL_ADVAGG_VERSION="^3.2" \
-    DRUPAL_BOOTSTRAP_VERSION="^3.5" \
+    VIDEO_EMBED_FIELD_VERSION="~1.5" \
+    DRUPAL_BACKUP_DB_VERSION="~1.2" \
+    DRUPAL_ADVAGG_VERSION="~3.2" \
+    DRUPAL_BOOTSTRAP_VERSION="~3.5" \
     MYSQL2SQLITE_VERSION="1b0b5d610c6090422625a2c58d2c23d2296eab3a" \
-    DRUPAL_SECURITY_REVIEW_VERSION="^1.3" \
+    DRUPAL_SECURITY_REVIEW_VERSION="~1.3" \
     NPS_VERSION="1.12.34.2" \
-    NPS_STREAM="stable"
+    NPS_STREAM="stable" \
+    DRUPAL_GROUP_VERSION="~1.0" \
+    DRUPAL_ADMIN_TOOLBAR_VERSION="~1" \
+    DRUPAL_PATHAUTO_VERSION="~1.0" \
+    DRUPAL_METATAG_VERSION="~1.2" \
+    DRUPAL_VIEWS_SLIDESHOW_VERSION="~4.5" \
+    DRUPAL_DS_VERSION="~3.1" \
+    DRUPAL_ADDTOANY_VERSION="~1.8" \
+    DRUPAL_GOOGLE_MAP_FIELD_VERSION="~1.4" \
+    DRUPAL_SLICK_MEDIA_VERSION="~1.0"
 
 ########################
 ######## ROOT ##########
@@ -172,20 +180,36 @@ RUN ~/bin/drush core-status
 #   To mitigate docker build running out of memory, we split up the composer require commands
 #########
 
-# Video embedding (https://www.drupal.org/project/video_embed_field)
 # config_installer: Because of bug https://www.drupal.org/node/1613424, we need this custom install profile
 RUN ~/bin/drush dl config_installer
-RUN ~/bin/composer require "drupal/video_embed_field ${VIDEO_EMBED_FIELD_VERSION}"
 
+# Install Video Embed Field
 # Install Backup and Migrate
 # Install Advanced CSS/JS Aggregation
-# Install security review
-# Install workbench moderation
+# Install Security Review
+# Install Group
+# Install Admin Toolbar
+# Install PathAuto
+# Install Metatag
+# Install Views Slideshow
+# Install Display Suite
+# Install Google Map Field
+# Install Slick Media
+# Install AddToAny
 RUN ~/bin/composer require \
+        "drupal/video_embed_field ${VIDEO_EMBED_FIELD_VERSION}" \
         "drupal/backup_db ${DRUPAL_BACKUP_DB_VERSION}" \
         "drupal/advagg ${DRUPAL_ADVAGG_VERSION}" \
         "drupal/security_review ${DRUPAL_SECURITY_REVIEW_VERSION}" \
-        "drupal/workbench_moderation ${DRUPAL_WORKBENCH_MODERATION_VERSION}"
+        "drupal/group ${DRUPAL_GROUP_VERSION}" \
+        "drupal/admin_toolbar ${DRUPAL_ADMIN_TOOLBAR_VERSION}" \
+        "drupal/pathauto ${DRUPAL_PATHAUTO_VERSION}" \
+        "drupal/metatag ${DRUPAL_METATAG_VERSION}" \
+        "drupal/views_slideshow ${DRUPAL_VIEWS_SLIDESHOW_VERSION}" \
+        "drupal/ds ${DRUPAL_DS_VERSION}" \
+        "drupal/google_map_field ${DRUPAL_GOOGLE_MAP_FIELD_VERSION}" \
+        "drupal/slick_media ${DRUPAL_SLICK_MEDIA_VERSION}" \
+        "drupal/addtoany ${DRUPAL_ADDTOANY_VERSION}"
 
 # Install Bootstrap base theme
 RUN ~/bin/composer require \
@@ -213,11 +237,15 @@ COPY filesystem/etc/ /etc/
 COPY filesystem/usr/local/etc/ /usr/local/etc/
 RUN rm -f /usr/local/etc/php-fpm.d/zz-docker.conf
 
-# Initial configuration for the 'all' site ...
+# External libraries: http://cgit.drupalcode.org/views_slideshow/tree/README.txt
+RUN mkdir -p libraries/jquery.cycle && cd libraries/jquery.cycle && curl -LO https://malsup.github.io/jquery.cycle.all.js \
+    && mkdir -p ../../libraries/jquery.hoverIntent && cd ../../libraries/jquery.hoverIntent && curl -LO http://cherne.net/brian/resources/jquery.hoverIntent.js \
+    && mkdir -p ../../libraries/json2 && cd ../../libraries/json2 && curl -LO https://raw.githubusercontent.com/douglascrockford/JSON-js/master/json2.js
 
+# Initial configuration for the 'all' site ...
 COPY filesystem/var/www/html/ /var/www/html
-RUN chown -R www-data:www-data /var/www/html/sites/all/modules /var/www/html/sites/all/themes
-RUN chown www-data:www-data /var/www/html/*
+RUN chown -R www-data:www-data /var/www/html/sites/all/modules /var/www/html/sites/all/themes && \
+    chown www-data:www-data /var/www/html/*
 
 # Compile themes
 

@@ -187,7 +187,47 @@ function enable_required_modules {
   echo Enabling the Loadbalancing cookie
   drush -y pm-enable loadbalancing_cookie
 
+  echo Enabling the Group module ...
+  drush -y pm-enable group
+  drush -y pm-enable gnode
+
+  echo Enabling the Admin Toolbar module ...
+  drush -y pm-enable admin_toolbar
+  drush -y pm-enable admin_toolbar_tools
+
+  echo Enabling the PathAuto module ...
+  drush -y pm-enable pathauto
+
+  echo Enabling the Metatag module ...
+  drush -y pm-enable metatag
+
+  echo Enabling the Views Slideshow module ...
+  drush -y pm-enable views_slideshow
+  drush -y pm-enable views_slideshow_cycle
+
+  echo Enabling the Display Suite module ...
+  drush -y pm-enable ds
+
+  echo Enabling the AddToAny module ...
+  drush -y pm-enable addtoany
+
+  echo Enabling the Telephone module ...
+  drush -y pm-enable telephone
+
+  echo Enabling the Forum module ...
+  drush -y pm-enable forum
+
+  echo Enabling the Video Embed Field module ...
+  drush -y pm-enable video_embed_field
+  drush -y pm-enable video_embed_wysiwyg
+  drush -y pm-enable video_embed_media
+
+  echo Enabling the Slick Media module ...
+  drush -y pm-enable slick_media
+  drush -y pm-enable slick_ui
+
   # Now re-apply the configuration (especially for DirectJude sub theme which was uninstalled and reset to default settings)
+  # NOTE: This may fail here if you've added in modules. If it does, comment these two lines and then sync the storage-config
   cp -p /var/lib/site/storage-config/active-original/* /var/lib/site/storage-config/active
   drush -y entity-updates
 }
