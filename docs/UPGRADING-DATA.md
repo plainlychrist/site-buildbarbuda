@@ -9,14 +9,14 @@ Your typical workflow would be:
 5. Run the **security review checklist** by going to https://your_new_site/admin/reports/security-review and clicking `Run > Run checklist`
 6. [Upgrade the configuration](../UPGRADING-CONFIG.md), but stop at the `git commit` step
 7. Go into your `site-buildbarbuda` directory (where you can do `git` commands). Verify by running `git remote -v` and make sure you see `https://github.com/plainlychrist/site-buildbarbuda.git`
-8. Run `docker exec -it siteec2linuxdesktop_web_1 /home/drupaladmin/bin/drush cr`. Then run `docker exec -it siteec2linuxdesktop_web_1 runuser -u www-data /var/lib/site/bin/sanitized-backup.sh`. **If it fails** with a bunch of SQL statements after `Comparing /var/lib/site/resources/sanitized-backup/database_structure.txt against the output` or does not say `COMPLETE: Done`, then you must:
+8. Run `docker exec -it sitebuildbarbudaec2linuxdesktop_web_1 /home/drupaladmin/bin/drush cr`. Then run `docker exec -it sitebuildbarbudaec2linuxdesktop_web_1 runuser -u www-data /var/lib/site/bin/sanitized-backup.sh`. **If it fails** with a bunch of SQL statements after `Comparing /var/lib/site/resources/sanitized-backup/database_structure.txt against the output` or does not say `COMPLETE: Done`, then you must:
     * Decide whether the database changes (you may have had an Drupal security update, or you may have installed a new module) are what you wanted. If they are not, **start over**.
     * Copy the *drush* command it gave you. We'll assume it was `/home/drupaladmin/bin/drush sql-dump --extra='--no-data --no-create-db --skip-create-options --skip-lock-tables --compact'` below. Change it below if it is different.
     * Run:
         ```
-        docker exec -it siteec2linuxdesktop_web_1 /home/drupaladmin/bin/drush sql-dump --extra='--no-data --no-create-db --skip-create-options --skip-lock-tables --compact' | bash -c 'tr -d $"\r"' > filesystem/var/lib/site/resources/sanitized-backup/database_structure.txt
+        docker exec -it sitebuildbarbudaec2linuxdesktop_web_1 /home/drupaladmin/bin/drush sql-dump --extra='--no-data --no-create-db --skip-create-options --skip-lock-tables --compact' | bash -c 'tr -d $"\r"' > filesystem/var/lib/site/resources/sanitized-backup/database_structure.txt
 
-        docker cp filesystem/var/lib/site/resources/sanitized-backup/database_structure.txt siteec2linuxdesktop_web_1:/var/lib/site/resources/sanitized-backup/database_structure.txt
+        docker cp filesystem/var/lib/site/resources/sanitized-backup/database_structure.txt sitebuildbarbudaec2linuxdesktop_web_1:/var/lib/site/resources/sanitized-backup/database_structure.txt
         ```
     * Go back and re-run this step (`sanitized-backup.sh`), and make sure it doesn't fail.
 9. Run the following to make a new bootstrap database template from the sanitized backup:

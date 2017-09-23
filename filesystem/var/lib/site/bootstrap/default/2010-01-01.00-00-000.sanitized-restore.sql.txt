@@ -1,2 +1,2 @@
 DROP TABLE IF EXISTS `users_field_data`;
-ALTER TABLE `san_25827fd58208a88d974e9d0aaa74e8a53b9e9d10ebb4a83416e1093c` RENAME TO `users_field_data`;
+ALTER TABLE `san_b825d3a4d976d117d2ab8741782a3c7afb65d28317a03ec811de9cf3` RENAME TO `users_field_data`;
