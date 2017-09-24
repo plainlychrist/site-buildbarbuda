@@ -5,6 +5,7 @@ DEFAULT_SETTINGS=/var/www/html/sites/default/default.settings.php
 SERVICES=/var/www/html/sites/default/services.yml
 SETTINGS=/var/www/html/sites/default/settings.php
 STORAGE_CONFIG=/var/lib/site/storage-config
+MERGE_CONFIG=/var/lib/site/merge-config
 
 function restore_data {
   local RESTORE_URL="$1"
@@ -146,18 +147,22 @@ function generate_services_file_config {
 }
 
 function enable_required_modules {
-  # Before we enable or uninstall modules (which changes storage-config/active), let's
-  # save the configuration so we can re-apply it later
-  STORAGE_CONFIG=/var/lib/site/storage-config
-  if [[ -d /var/lib/site/storage-config/active-original ]]; then
-    rm -rf /var/lib/site/storage-config/active-original
-  fi
-  cp -rp /var/lib/site/storage-config/active /var/lib/site/storage-config/active-original
+  # drush, running as drupaladmin, may need write access to active/*.yml.
+  # That includes permission to change permissions on new .yml files, which requires drupaladmin as the owner of the files
+  chown -R drupaladmin:www-data "${STORAGE_CONFIG}/active"
+  chmod -R 664 "${STORAGE_CONFIG}/active"
+  find "${STORAGE_CONFIG}/active" -type d -print0 | xargs -0 chmod 775
 
-  # Enable the modules that must be present, regardless of configuration.
-  # Note that configuration in active/ will automatically enable any module it refers to, so
-  # the modules listed below are only really relevant for a barebones no-configuration system.
-  # Basically, Day 1 of the source code.
+  # Make sure all entities defined in configuration are present in database.
+  # This will have the side-effect of enabling all modules defined in the configuration.
+  drush -y entity-updates
+
+  # Enable the modules that must be present, especially if they are referred to by the configuration.
+  # The enabling of a module will NOT overwrite the /active configuration.
+  # Notice that the former command already enabled all modules in the config, so all the explicit
+  # enables we see in the remainder of this method are for Day 1: when we didn't have any configuration
+  # or we are defining new configuration.
+  # TODO: Use 'drupal' rather than drush, because some modules may need composer to install correctly.
 
   echo Enabling the Security Review module ...
   drush -y pm-enable security_review
@@ -174,11 +179,7 @@ function enable_required_modules {
   echo Enabling the Bootstrap base theme ...
   drush -y pm-enable bootstrap
 
-  echo 'Setting Bartik as the default theme to retrigger theme installation (hack)'
-  drush -y cset system.theme default bartik
-
-  echo Reinstalling the DirectJude sub theme ...
-  drush -y pm-uninstall directjude
+  echo Enabling the DirectJude sub theme ...
   drush -y pm-enable directjude
 
   echo Setting DirectJude as the default theme, which is our desired theme
@@ -226,9 +227,7 @@ function enable_required_modules {
   drush -y pm-enable slick_media
   drush -y pm-enable slick_ui
 
-  # Now re-apply the configuration (especially for DirectJude sub theme which was uninstalled and reset to default settings)
-  # NOTE: This may fail here if you've added in modules. If it does, comment these two lines and then sync the storage-config
-  cp -p /var/lib/site/storage-config/active-original/* /var/lib/site/storage-config/active
+  # If there was new config, get the database in sync
   drush -y entity-updates
 }
 
@@ -239,12 +238,12 @@ function enable_required_modules {
 generate_services_file_config
 
 HAVE_STORED_CONFIG=1
-if [[ ! -e ${STORAGE_CONFIG}/active/system.site.yml ]]; then # there is no Docker mount to a 'git' workspace
+if [[ ! -e ${MERGE_CONFIG}/system.site.yml ]]; then # there is no Docker mount to a 'git' workspace
   HAVE_STORED_CONFIG=0
-  install -d ${STORAGE_CONFIG}
-  install -o drupaladmin -d ${STORAGE_CONFIG}/staging # configs for manual import should never be modified by the running Drupal system
-  install -o drupaladmin -g www-data -m 775 -d ${STORAGE_CONFIG}/active ${STORAGE_CONFIG}/sync
 fi
+install -d ${STORAGE_CONFIG}
+install -o drupaladmin -d ${STORAGE_CONFIG}/staging # configs for manual import should never be modified by the running Drupal system
+install -o drupaladmin -g www-data -m 775 -d ${STORAGE_CONFIG}/active ${STORAGE_CONFIG}/sync
 
 # Make a random salt for hardening against SQL injections
 generate_salt_file
@@ -286,15 +285,16 @@ if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
   generate_settings_file_config >> ${SETTINGS}
 
   if [[ $DATABASE_WRITER -eq 1 ]]; then
+    # Merge any new config into the existing active config (if any)
+    echo Merging new configuration ...
+    rsync --archive --ignore-existing --verbose ${MERGE_CONFIG}/ ${STORAGE_CONFIG}/active
+
     # Verify settings are good (this is just visual)
     drush core-status
 
     # Unblock the admin account and rename to our admin user (for now, 'admin'). Then reset password
     drush sql-query "UPDATE users_field_data SET name='admin', status=1 WHERE uid=1;"
     drush user-password admin --password="${WEB_ADMIN_PASSWORD}"
-
-    # Make sure all entities defined in configuration are present in database
-    drush -y entity-updates
 
     # enable all required modules
     enable_required_modules

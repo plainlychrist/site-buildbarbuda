@@ -15,6 +15,7 @@ function usage()
     echo "-p|--use-postfix                Use Postfix with TLS and SASL security. Expects the POSTFIX_DOMAIN, POSTFIX_RELAY_HOST, POSTFIX_USER, POSTFIX_PASSWORD environment variables to be set. POSTFIX_RELAY_PORT, POSTFIX_SASL_SECURITY_OPTIONS, and POSTFIX_SASL_TLS_SECURITY_OPTIONS are optional, and default to 587, 'noanonymous,noplaintext' and 'noanonymous', respectively. Typically POSTFIX_DOMAIN is your email domain (the part after the @ in your email address), and POSTFIX_USER is the full email address of whoever is allowed to send out emails, and POSTFIX_RELAY_HOST is the name of your SMTP server" >&2
     echo "-b|--bootstrap WEBSITE_URL      Bootstrap the data from a live website. This will fetch the latest available snapshot of the data, and only a sanitized (the users are stripped of identifying information) version of that data. The WEBSITE_URL can be https://buildbarbuda.org; you MUST TRUST the site as the site will have the ability to install arbitrary code on your site. The bootstrapping will only occur if there is no data yet on your site. The live data is from a MySQL database, and is automatically converted to SQLite if you are not using MySQL yourself; that conversion is not perfect, so using MySQL is recommended" >&2
     echo "--no-op                         This option will be ignored, and is only needed as a placeholder for automated tools that call this script" >&2
+    echo "--no-start                      Do not start the supervisor daemon. Useful for debugging instead the container" >&2
 }
 
 function drush()
@@ -28,6 +29,7 @@ USE_MYSQL=0
 USE_POSTFIX=0
 BOOTSTRAP_URL=""
 HASH_SALT=""
+NO_START=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -h|--help)
@@ -69,6 +71,10 @@ while [[ $# -gt 0 ]]; do
     --trust-this-ec2-local-ipv4)
       LOCAL_IPV4="^$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4 | sed 's/[.]/\\./g')$"
       TRUSTED_HOST_PATTERNS+=( ${LOCAL_IPV4} )
+      shift
+      ;;
+    --no-start)
+      NO_START=1
       shift
       ;;
     *)
@@ -140,20 +146,23 @@ fi
 
 # https://www.drupal.org/node/244924
 echo Securing POSIX permissions for web account ...
-find /var/www/html -type f -exec chmod a-w {} \;
-find /var/www/html -type d -exec chmod a-w {} \;
+set -x
+chmod -R a-w /var/www/html
 install -o drupaladmin -g www-data -m 755 -d /var/www/html/modules
 install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default/files/public-backups
 chown -R drupaladmin:www-data /var/www/html/sites/default/files /var/lib/site/storage-config/sync
-find /var/www/html/sites/default/files -type d -exec chmod 770 {} \;
-find /var/lib/site/storage-config/sync -type d -exec chmod 770 {} \;
+find /var/www/html/sites/default/files -type d -print0 | xargs -0 chmod 770
+find /var/lib/site/storage-config/sync -type d -print0 | xargs -0 chmod 770
 chown -R www-data:drupaladmin /var/lib/site/storage-config/active # the update.php will try to chmod here, which means www-data needs to be owner
-find /var/lib/site/storage-config/active -type d -exec chmod 770 {} \;
-find /var/lib/site/storage-config/active -type f -exec chmod 664 {} \;
+find /var/lib/site/storage-config/active -type d -print0 | xargs -0 chmod 770
+find /var/lib/site/storage-config/active -type f -print0 | xargs -0 chmod 664
+set +x
 
 # Applying security advisory: https://www.drupal.org/SA-CORE-2013-003
 install -o drupaladmin -g www-data -m 444 /var/lib/site/settings/private.htaccess /var/www/private/.htaccess
 
-# Launch Apache and cron, with a supervisor to manage the two processes
-echo Starting the supervisor in the foreground ...
-exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
+if [[ $NO_START -eq 0 ]]; then
+  # Launch Apache and cron, with a supervisor to manage the two processes
+  echo Starting the supervisor in the foreground ...
+  exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
+fi

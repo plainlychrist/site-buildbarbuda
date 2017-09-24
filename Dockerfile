@@ -276,6 +276,6 @@ RUN chmod 500 /var/lib/site/bin/*.sh && \
   chown www-data /var/lib/site/bin/sanitized-backup.sh && \
   install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default && \
   install -o drupaladmin -g www-data -m 770 -d /var/www/private && \
-  chown -R drupaladmin:www-data /var/lib/site/storage-config/active
+  chown -R drupaladmin:www-data /var/lib/site/merge-config
 
 ENTRYPOINT ["/var/lib/site/bin/entry.sh"]
