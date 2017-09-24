@@ -155,7 +155,7 @@ find /var/www/html/sites/default/files -type d -print0 | xargs -0 chmod 770
 find /var/lib/site/storage-config/sync -type d -print0 | xargs -0 chmod 770
 chown -R www-data:drupaladmin /var/lib/site/storage-config/active # the update.php will try to chmod here, which means www-data needs to be owner
 find /var/lib/site/storage-config/active -type d -print0 | xargs -0 chmod 770
-find /var/lib/site/storage-config/active -type f -print0 | xargs -0 chmod 664
+find /var/lib/site/storage-config/active -type f -print0 | xargs -0 --no-run-if-empty chmod 664
 set +x
 
 # Applying security advisory: https://www.drupal.org/SA-CORE-2013-003
