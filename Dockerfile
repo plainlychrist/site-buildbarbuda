@@ -36,7 +36,8 @@ ENV NGINX_VERSION="1.13.3-1~jessie" \
     DRUPAL_DS_VERSION="~3.1" \
     DRUPAL_ADDTOANY_VERSION="~1.8" \
     DRUPAL_GOOGLE_MAP_FIELD_VERSION="~1.4" \
-    DRUPAL_SLICK_MEDIA_VERSION="~1.0"
+    DRUPAL_SLICK_MEDIA_VERSION="~1.0" \
+    DRUPAL_TERMS_OF_USE_VERSION="8.x-2.0-beta1"
 
 ########################
 ######## ROOT ##########
@@ -214,6 +215,10 @@ RUN ~/bin/composer require \
 # Install Bootstrap base theme
 RUN ~/bin/composer require \
         "drupal/bootstrap ${DRUPAL_BOOTSTRAP_VERSION}"
+
+# Install modules that don't work yet with composer ...
+# Install Terms of Use
+RUN ~/bin/drush dl "terms_of_use-${DRUPAL_TERMS_OF_USE_VERSION}"
 
 # Install mysql2sqlite
 RUN curl "https://raw.githubusercontent.com/dumblob/mysql2sqlite/${MYSQL2SQLITE_VERSION}/mysql2sqlite" > ~/bin/mysql2sqlite && \

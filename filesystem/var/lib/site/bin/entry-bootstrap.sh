@@ -227,6 +227,9 @@ function enable_required_modules {
   drush -y pm-enable slick_media
   drush -y pm-enable slick_ui
 
+  echo Enabling the Terms of Use module ...
+  drush -y pm-enable terms_of_use
+
   # If there was new config, get the database in sync
   drush -y entity-updates
 }
