@@ -6,7 +6,12 @@ set -x
 
 if ! apt-get install man-db -y; then
   apt-get update
-  apt-get install man-db vim -y
+  # man-db: who doesn't like man?
+  # vim: you need an editor
+  # ruby2.1: needed for 'sass'
+  # ack-grep: searching a lot of source code (HTML, JS, CSS) is much easier with ack
+  # wget: downloading made easy
+  apt-get install man-db vim ruby2.1 ack-grep wget -y
 fi
 
 cd /var/www/html
@@ -18,10 +23,15 @@ find /var/www/html/vendor -print0 | xargs -0 chmod u+w
 find /var/www/html/vendor -print0 | xargs -0 chown drupaladmin
 find /var/www/html/modules -print0 | xargs -0 chmod u+w
 find /var/www/html/modules -print0 | xargs -0 chown drupaladmin
+chmod -R a+w /var/www/html/sites/all/themes/directjude
 
 # Adjust history permissions
-chown root:root /root/.bash_history
-chown drupaladmin:drupaladmin /home/drupaladmin/.bash_history
+if [[ -e /root/.bash_history ]]; then
+  chown root:root /root/.bash_history
+fi
+if [[ -e /home/drupaladmin/.bash_history ]]; then
+  chown drupaladmin:drupaladmin /home/drupaladmin/.bash_history
+fi
 
 # Install Drupal Console
 runuser -s /bin/bash -c '/home/drupaladmin/bin/composer require drupal/console:~1.0 --prefer-dist --optimize-autoloader' drupaladmin

@@ -50,8 +50,7 @@ Another terminal for automatically recompiling the CSS files:
 
 ```bash
 cd $HOME/Documents/site-buildbarbuda
-docker exec site-buildbarbuda bash -c 'cd /tmp && chmod -R a+w /var/www/html/sites/all/themes/directjude && sass --default-encoding UTF-8 --debug-info --watch /var/www/html/sites/all/themes/directjude/sass/style.scss:/var/www/html/sites/all/themes/dir
-ectjude/css/style.css'
+docker exec site-buildbarbuda bash -c 'cd /tmp && chmod -R a+w /var/www/html/sites/all/themes/directjude && sass --default-encoding UTF-8 --debug-info --watch /var/www/html/sites/all/themes/directjude/sass/style.scss:/var/www/html/sites/all/themes/directjude/css/style.css'
 ```
 
 ## Accessing the Linux website container
