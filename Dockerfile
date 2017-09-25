@@ -37,7 +37,8 @@ ENV NGINX_VERSION="1.13.3-1~jessie" \
     DRUPAL_ADDTOANY_VERSION="~1.8" \
     DRUPAL_GOOGLE_MAP_FIELD_VERSION="~1.4" \
     DRUPAL_SLICK_MEDIA_VERSION="~1.0" \
-    DRUPAL_TERMS_OF_USE_VERSION="8.x-2.0-beta1"
+    DRUPAL_TERMS_OF_USE_VERSION="~2.0@dev" \
+    DRUPAL_GOOGLE_ANALYTICS_VERSION="~2.1"
 
 ########################
 ######## ROOT ##########
@@ -73,8 +74,11 @@ RUN apt-get -y update && \
 # - skips installing nginx-module-*
 # - skips remove /var/lib/apt/lists/*
 
-RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62 \
-	&& echo "deb http://nginx.org/packages/mainline/debian/ jessie nginx" >> /etc/apt/sources.list \
+# mimic: apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62
+# by placing filesystem/etc/apt/trusted.gpg.d/nginx-org.asc in http://manpages.ubuntu.com/manpages/zesty/man8/apt-key.8.html keyring
+COPY filesystem/etc/apt/ /etc/apt/
+RUN apt-key add /etc/apt/trusted.gpg.d/nginx-org.asc && \
+    echo "deb http://nginx.org/packages/mainline/debian/ jessie nginx" >> /etc/apt/sources.list \
 	&& apt-get update \
 	&& apt-get install --no-install-recommends --no-install-suggests -y \
 						ca-certificates \
@@ -197,6 +201,8 @@ RUN ~/bin/drush dl config_installer
 # Install Google Map Field
 # Install Slick Media
 # Install AddToAny
+# Install Terms of Use
+# Install Google Analytics
 RUN ~/bin/composer require \
         "drupal/video_embed_field ${VIDEO_EMBED_FIELD_VERSION}" \
         "drupal/backup_db ${DRUPAL_BACKUP_DB_VERSION}" \
@@ -210,15 +216,13 @@ RUN ~/bin/composer require \
         "drupal/ds ${DRUPAL_DS_VERSION}" \
         "drupal/google_map_field ${DRUPAL_GOOGLE_MAP_FIELD_VERSION}" \
         "drupal/slick_media ${DRUPAL_SLICK_MEDIA_VERSION}" \
-        "drupal/addtoany ${DRUPAL_ADDTOANY_VERSION}"
+        "drupal/addtoany ${DRUPAL_ADDTOANY_VERSION}" \
+        "drupal/terms_of_use ${DRUPAL_TERMS_OF_USE_VERSION}" \
+        "drupal/google_analytics ${DRUPAL_GOOGLE_ANALYTICS_VERSION}"
 
 # Install Bootstrap base theme
 RUN ~/bin/composer require \
         "drupal/bootstrap ${DRUPAL_BOOTSTRAP_VERSION}"
-
-# Install modules that don't work yet with composer ...
-# Install Terms of Use
-RUN ~/bin/drush dl "terms_of_use-${DRUPAL_TERMS_OF_USE_VERSION}"
 
 # Install mysql2sqlite
 RUN curl "https://raw.githubusercontent.com/dumblob/mysql2sqlite/${MYSQL2SQLITE_VERSION}/mysql2sqlite" > ~/bin/mysql2sqlite && \

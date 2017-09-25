@@ -230,6 +230,9 @@ function enable_required_modules {
   echo Enabling the Terms of Use module ...
   drush -y pm-enable terms_of_use
 
+  echo Enabling the Google Analytics module ...
+  drush -y pm-enable google_analytics
+
   # If there was new config, get the database in sync
   drush -y entity-updates
 }
