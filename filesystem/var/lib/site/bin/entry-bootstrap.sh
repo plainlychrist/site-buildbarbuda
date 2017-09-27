@@ -266,7 +266,7 @@ if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
     DATABASE_WRITER=1
     echo "Won the election to create the Drupal tables. We are the database creator."
   else
-    echo "Could not create the table site_phase1. Another creator on a machine was elected to create the Drupal tables."
+    echo "Could not create the table site_phase1. Another creator on another machine was elected to create the Drupal tables."
   fi
 
   if [[ $DATABASE_WRITER -eq 1 ]]; then
@@ -316,10 +316,10 @@ if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
     drush sql-query --db-url="${DB_URL}" 'CREATE TABLE site_phase2(id INT);'
   else
     # Wait for the winner to complete
-    echo "We'll wait until the elected database creator is complete ..."
+    echo "$(date) We'll wait until the elected database creator is complete ..."
     while true; do
       if drush sql-query --db-url="${DB_URL}" 'SELECT 1 FROM site_phase2;'; then
-        echo "Finished waiting for the elected database creator to create the database"
+        echo "$(date) Finished waiting for the elected database creator to create the database"
         break
       else
         # Wait 5 seconds for retry
