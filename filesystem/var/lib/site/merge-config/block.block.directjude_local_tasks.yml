@@ -9,7 +9,7 @@ _core:
 id: directjude_local_tasks
 theme: directjude
 region: content
-weight: -7
+weight: -5
 provider: null
 plugin: local_tasks_block
 settings:

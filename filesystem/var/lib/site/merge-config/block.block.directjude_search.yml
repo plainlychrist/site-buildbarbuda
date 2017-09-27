@@ -4,14 +4,15 @@ status: true
 dependencies:
   module:
     - search
+    - system
   theme:
     - directjude
 _core:
   default_config_hash: za-39d5WDUg6XvbyqSnuVYEeq6QM4qKJxW8MnoAha5A
 id: directjude_search
 theme: directjude
-region: sidebar_first
-weight: -1
+region: sidebar_second
+weight: -6
 provider: null
 plugin: search_form_block
 settings:
@@ -19,4 +20,9 @@ settings:
   label: Search
   provider: search
   label_display: visible
-visibility: {  }
+visibility:
+  request_path:
+    id: request_path
+    pages: '<front>'
+    negate: false
+    context_mapping: {  }

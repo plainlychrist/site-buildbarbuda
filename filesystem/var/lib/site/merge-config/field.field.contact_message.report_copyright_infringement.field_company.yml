@@ -1,0 +1,19 @@
+uuid: eaa17fb5-354e-4b1f-8b6b-1821d6902f68
+langcode: en
+status: true
+dependencies:
+  config:
+    - contact.form.report_copyright_infringement
+    - field.storage.contact_message.field_company
+id: contact_message.report_copyright_infringement.field_company
+field_name: field_company
+entity_type: contact_message
+bundle: report_copyright_infringement
+label: Company
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

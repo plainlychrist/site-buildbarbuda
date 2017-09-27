@@ -1,6 +1,6 @@
 uuid: 0b43d5b2-4a1c-4624-a728-ae5edc10e670
 langcode: en
-status: true
+status: false
 dependencies:
   module:
     - system
@@ -11,7 +11,7 @@ _core:
 id: directjude_branding
 theme: directjude
 region: header
-weight: 0
+weight: -7
 provider: null
 plugin: system_branding_block
 settings:

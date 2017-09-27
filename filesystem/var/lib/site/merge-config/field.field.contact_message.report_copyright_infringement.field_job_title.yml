@@ -1,0 +1,19 @@
+uuid: 067d547c-e783-4b7d-84a1-d1eae0798d7f
+langcode: en
+status: true
+dependencies:
+  config:
+    - contact.form.report_copyright_infringement
+    - field.storage.contact_message.field_job_title
+id: contact_message.report_copyright_infringement.field_job_title
+field_name: field_job_title
+entity_type: contact_message
+bundle: report_copyright_infringement
+label: 'Job title'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

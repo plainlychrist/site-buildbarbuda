@@ -1,0 +1,31 @@
+uuid: acfa8abe-d61c-4c40-9aa2-edd52790fec4
+langcode: en
+status: true
+dependencies:
+  content:
+    - 'block_content:basic:9bf1f5a5-b48d-4ec7-982c-b14191f5b2b2'
+  module:
+    - block_content
+    - system
+  theme:
+    - directjude
+id: twitterhashtagbarbuda
+theme: directjude
+region: sidebar_second
+weight: 0
+provider: null
+plugin: 'block_content:9bf1f5a5-b48d-4ec7-982c-b14191f5b2b2'
+settings:
+  id: 'block_content:9bf1f5a5-b48d-4ec7-982c-b14191f5b2b2'
+  label: 'Twitter Hashtag Barbuda'
+  provider: block_content
+  label_display: visible
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  request_path:
+    id: request_path
+    pages: '<front>'
+    negate: false
+    context_mapping: {  }

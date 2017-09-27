@@ -1,0 +1,17 @@
+uuid: 72ebcfc7-4c8c-4c37-99ec-b793b765d5fc
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.barbudan_family
+  enforced:
+    config:
+      - user.role.administrator
+id: barbudan_family-a416e6833
+label: Administrator
+weight: 2
+internal: true
+audience: outsider
+group_type: barbudan_family
+permissions_ui: false
+permissions: {  }

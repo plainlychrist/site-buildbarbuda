@@ -1,0 +1,99 @@
+uuid: 08ddd3eb-36c3-4337-9f87-e148487d0be4
+langcode: en
+status: true
+dependencies:
+  config:
+    - contact.form.report_copyright_infringement
+    - field.field.contact_message.report_copyright_infringement.field_address
+    - field.field.contact_message.report_copyright_infringement.field_company
+    - field.field.contact_message.report_copyright_infringement.field_copyright_owner
+    - field.field.contact_message.report_copyright_infringement.field_country
+    - field.field.contact_message.report_copyright_infringement.field_fax_number
+    - field.field.contact_message.report_copyright_infringement.field_job_title
+    - field.field.contact_message.report_copyright_infringement.field_phone_number
+    - field.field.contact_message.report_copyright_infringement.field_postal_code
+    - field.field.contact_message.report_copyright_infringement.field_state_province
+id: contact_message.report_copyright_infringement.default
+targetEntityType: contact_message
+bundle: report_copyright_infringement
+mode: default
+content:
+  field_address:
+    weight: 5
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_company:
+    weight: 3
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_copyright_owner:
+    weight: 1
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_country:
+    weight: 8
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_fax_number:
+    weight: 11
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  field_job_title:
+    weight: 4
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_phone_number:
+    weight: 10
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  field_postal_code:
+    weight: 7
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_state_province:
+    weight: 6
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  message:
+    type: string
+    weight: 0
+    label: above
+    region: content
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+hidden: {  }

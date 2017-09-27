@@ -1,0 +1,21 @@
+uuid: f28bb3a4-041d-46e6-a29e-8a45b4b3d7e5
+langcode: en
+status: true
+dependencies:
+  config:
+    - contact.form.report_copyright_infringement
+    - field.storage.contact_message.field_phone_number
+  module:
+    - telephone
+id: contact_message.report_copyright_infringement.field_phone_number
+field_name: field_phone_number
+entity_type: contact_message
+bundle: report_copyright_infringement
+label: 'Phone Number (optional)'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: telephone

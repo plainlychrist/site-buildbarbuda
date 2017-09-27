@@ -10,8 +10,8 @@ _core:
   default_config_hash: 8I8iACSa0sKO3k3jlvUG1ge52rfcKX7USJAQYnzuBgg
 id: directjude_help
 theme: directjude
-region: content
-weight: -7
+region: help
+weight: -6
 provider: null
 plugin: help_block
 settings:

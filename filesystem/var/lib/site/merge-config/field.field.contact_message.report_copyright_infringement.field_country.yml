@@ -1,0 +1,19 @@
+uuid: add90523-064d-4e4a-b017-8492ed0204ec
+langcode: en
+status: true
+dependencies:
+  config:
+    - contact.form.report_copyright_infringement
+    - field.storage.contact_message.field_country
+id: contact_message.report_copyright_infringement.field_country
+field_name: field_country
+entity_type: contact_message
+bundle: report_copyright_infringement
+label: Country
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

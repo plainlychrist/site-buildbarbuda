@@ -1,0 +1,24 @@
+uuid: c9f384d7-3164-425d-96ed-5d867074a9db
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.barbudan_family
+id: barbudan_family-admin
+label: Admin
+weight: 100
+internal: false
+audience: member
+group_type: barbudan_family
+permissions_ui: true
+permissions:
+  - 'access content overview'
+  - 'administer group'
+  - 'delete group'
+  - 'edit group'
+  - 'administer members'
+  - 'update own group_membership content'
+  - 'leave group'
+  - 'view group_membership content'
+  - 'view group'
+  - 'access group_node overview'

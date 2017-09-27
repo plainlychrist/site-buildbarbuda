@@ -1,0 +1,12 @@
+uuid: d783d10c-bfbe-4677-bdb3-04529d6c8237
+langcode: en
+status: true
+dependencies: {  }
+id: report_copyright_infringement
+label: 'Report copyright infringement'
+recipients:
+  - dmca-reports@buildbarbuda.org
+reply: 'We have received your copyright infringement report. Please email dmca-reports@buildbarbuda.org if you have not received a response within 10 business days.'
+weight: 0
+message: 'You should receive an automated email within a few minutes. Please check your Spam folder if you haven''t received the email by then.'
+redirect: ''

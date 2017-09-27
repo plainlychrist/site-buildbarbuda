@@ -11,7 +11,7 @@ _core:
 id: directjude_breadcrumbs
 theme: directjude
 region: navigation
-weight: 0
+weight: -6
 provider: null
 plugin: system_breadcrumb_block
 settings:

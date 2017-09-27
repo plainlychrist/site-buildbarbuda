@@ -1,0 +1,21 @@
+uuid: 0de10c5f-bfa3-4a98-8882-700439ef76a1
+langcode: en
+status: true
+dependencies:
+  module:
+    - contact
+id: contact_message.field_state_province
+field_name: field_state_province
+entity_type: contact_message
+type: string
+settings:
+  max_length: 255
+  is_ascii: false
+  case_sensitive: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,4 +1,4 @@
-uuid: 495bdbb2-490e-4430-808a-68d978040ec2
+uuid: bb3ca97c-df1e-42d9-b62d-c1c526cc55f2
 langcode: en
 status: true
 dependencies:
@@ -10,5 +10,5 @@ _core:
 name: Forums
 vid: forums
 description: 'Forum navigation vocabulary'
-hierarchy: 1
+hierarchy: 0
 weight: -10

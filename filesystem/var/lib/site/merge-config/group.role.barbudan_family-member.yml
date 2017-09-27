@@ -1,0 +1,14 @@
+uuid: e1784b75-6dae-4433-b920-ab3132fe8d0d
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.barbudan_family
+id: barbudan_family-member
+label: Member
+weight: -100
+internal: true
+audience: member
+group_type: barbudan_family
+permissions_ui: true
+permissions: {  }

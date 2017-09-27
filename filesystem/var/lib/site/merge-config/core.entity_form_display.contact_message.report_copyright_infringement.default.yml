@@ -1,0 +1,115 @@
+uuid: 55867ced-6639-4568-92b9-426eead18298
+langcode: en
+status: true
+dependencies:
+  config:
+    - contact.form.report_copyright_infringement
+    - field.field.contact_message.report_copyright_infringement.field_address
+    - field.field.contact_message.report_copyright_infringement.field_company
+    - field.field.contact_message.report_copyright_infringement.field_copyright_owner
+    - field.field.contact_message.report_copyright_infringement.field_country
+    - field.field.contact_message.report_copyright_infringement.field_fax_number
+    - field.field.contact_message.report_copyright_infringement.field_job_title
+    - field.field.contact_message.report_copyright_infringement.field_phone_number
+    - field.field.contact_message.report_copyright_infringement.field_postal_code
+    - field.field.contact_message.report_copyright_infringement.field_state_province
+  module:
+    - telephone
+id: contact_message.report_copyright_infringement.default
+targetEntityType: contact_message
+bundle: report_copyright_infringement
+mode: default
+content:
+  copy:
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_address:
+    weight: 8
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_company:
+    weight: 6
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_copyright_owner:
+    weight: 4
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_country:
+    weight: 11
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_fax_number:
+    weight: 14
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: telephone_default
+    region: content
+  field_job_title:
+    weight: 7
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_phone_number:
+    weight: 13
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: telephone_default
+    region: content
+  field_postal_code:
+    weight: 10
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_state_province:
+    weight: 9
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  mail:
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  name:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  preview:
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  message: true
+  subject: true

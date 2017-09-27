@@ -1,0 +1,19 @@
+uuid: cec0fa52-2147-4d90-880b-c45681434df8
+langcode: en
+status: true
+dependencies:
+  config:
+    - contact.form.report_copyright_infringement
+    - field.storage.contact_message.field_state_province
+id: contact_message.report_copyright_infringement.field_state_province
+field_name: field_state_province
+entity_type: contact_message
+bundle: report_copyright_infringement
+label: State/Province
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

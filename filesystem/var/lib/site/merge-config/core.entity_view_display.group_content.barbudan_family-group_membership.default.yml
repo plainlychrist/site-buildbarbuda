@@ -1,0 +1,23 @@
+uuid: 75f0871e-eb22-4def-9b1a-fca3e6bdbebc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.group_content.barbudan_family-group_membership.group_roles
+    - group.content_type.barbudan_family-group_membership
+id: group_content.barbudan_family-group_membership.default
+targetEntityType: group_content
+bundle: barbudan_family-group_membership
+mode: default
+content:
+  group_roles:
+    label: above
+    type: entity_reference_label
+    settings:
+      link: false
+    weight: -4
+    third_party_settings: {  }
+    region: content
+hidden:
+  entity_id: true
+  uid: true

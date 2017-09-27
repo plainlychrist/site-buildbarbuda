@@ -1,0 +1,20 @@
+uuid: 580402f5-2ad6-4ce4-80fe-01b9a56be77b
+langcode: en
+status: true
+dependencies:
+  module:
+    - media_entity
+id: media.field_image_height
+field_name: field_image_height
+entity_type: media
+type: integer
+settings:
+  unsigned: false
+  size: normal
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

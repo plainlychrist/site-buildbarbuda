@@ -1,0 +1,22 @@
+uuid: 18ffeda6-0a34-4a52-89fb-a10b8ea45b79
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.group_content.group_roles
+    - group.content_type.barbudan_family-group_membership
+id: group_content.barbudan_family-group_membership.group_roles
+field_name: group_roles
+entity_type: group_content
+bundle: barbudan_family-group_membership
+label: Roles
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'group_type:group_role'
+  handler_settings:
+    group_type_id: barbudan_family
+field_type: entity_reference

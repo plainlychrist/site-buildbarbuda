@@ -1,0 +1,14 @@
+uuid: 7db00439-837b-4749-82d9-25ec64e456ce
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.barbudan_family
+id: barbudan_family-outsider
+label: Outsider
+weight: -101
+internal: true
+audience: outsider
+group_type: barbudan_family
+permissions_ui: true
+permissions: {  }

@@ -1,0 +1,21 @@
+uuid: 550d89a1-ee5c-4af1-824c-47f9207c61be
+langcode: en
+status: true
+dependencies:
+  config:
+    - contact.form.report_copyright_infringement
+    - field.storage.contact_message.field_fax_number
+  module:
+    - telephone
+id: contact_message.report_copyright_infringement.field_fax_number
+field_name: field_fax_number
+entity_type: contact_message
+bundle: report_copyright_infringement
+label: 'Fax number (optional)'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: telephone

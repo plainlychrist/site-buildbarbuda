@@ -6,6 +6,7 @@ dependencies:
     - system.menu.tools
   module:
     - system
+    - user
   theme:
     - directjude
 _core:
@@ -13,7 +14,7 @@ _core:
 id: directjude_tools
 theme: directjude
 region: sidebar_first
-weight: 0
+weight: -7
 provider: null
 plugin: 'system_menu_block:tools'
 settings:
@@ -23,4 +24,12 @@ settings:
   label_display: visible
   level: 1
   depth: 0
-visibility: {  }
+visibility:
+  user_role:
+    id: user_role
+    roles:
+      authenticated: authenticated
+      administrator: administrator
+    negate: false
+    context_mapping:
+      user: '@user.current_user_context:current_user'

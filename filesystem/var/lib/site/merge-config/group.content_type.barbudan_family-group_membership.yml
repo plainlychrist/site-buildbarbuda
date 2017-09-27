@@ -1,0 +1,16 @@
+uuid: 506d32dd-d78e-4855-8047-28d0a3b5a265
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.barbudan_family
+  module:
+    - user
+id: barbudan_family-group_membership
+label: 'Barbudan Family: Group membership'
+description: 'Adds users to groups as members.'
+group_type: barbudan_family
+content_plugin: group_membership
+plugin_config:
+  group_cardinality: 2
+  entity_cardinality: 1

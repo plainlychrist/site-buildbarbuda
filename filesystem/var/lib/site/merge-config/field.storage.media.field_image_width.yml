@@ -1,0 +1,20 @@
+uuid: a6adbf45-c8d3-4483-b8fa-0e95ffbfaa67
+langcode: en
+status: true
+dependencies:
+  module:
+    - media_entity
+id: media.field_image_width
+field_name: field_image_width
+entity_type: media
+type: integer
+settings:
+  unsigned: false
+  size: normal
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

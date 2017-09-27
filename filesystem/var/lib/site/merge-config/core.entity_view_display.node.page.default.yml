@@ -16,18 +16,20 @@ bundle: page
 mode: default
 content:
   addtoany:
-    weight: 101
+    weight: 2
+    region: content
     settings: {  }
     third_party_settings: {  }
-    region: content
   body:
     label: hidden
     type: text_default
-    weight: 100
+    weight: 0
     settings: {  }
     third_party_settings: {  }
     region: content
   links:
-    weight: 101
+    weight: 1
     region: content
+    settings: {  }
+    third_party_settings: {  }
 hidden: {  }
