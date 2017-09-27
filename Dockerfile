@@ -23,7 +23,7 @@ ENV NGINX_VERSION="1.13.3-1~jessie" \
     VIDEO_EMBED_FIELD_VERSION="~1.5" \
     DRUPAL_BACKUP_DB_VERSION="~1.2" \
     DRUPAL_ADVAGG_VERSION="~3.2" \
-    DRUPAL_BOOTSTRAP_VERSION="~3.5" \
+    DRUPAL_BOOTSTRAP_VERSION="~3.6" \
     MYSQL2SQLITE_VERSION="1b0b5d610c6090422625a2c58d2c23d2296eab3a" \
     DRUPAL_SECURITY_REVIEW_VERSION="~1.3" \
     NPS_VERSION="1.12.34.2" \
@@ -38,7 +38,8 @@ ENV NGINX_VERSION="1.13.3-1~jessie" \
     DRUPAL_GOOGLE_MAP_FIELD_VERSION="~1.4" \
     DRUPAL_SLICK_MEDIA_VERSION="~1.0" \
     DRUPAL_TERMS_OF_USE_VERSION="~2.0@dev" \
-    DRUPAL_GOOGLE_ANALYTICS_VERSION="~2.1"
+    DRUPAL_RECAPTCHA_VERSION="~2.2" \
+    DRUPAL_GOOGLE_ANALYTICS_VERSION="~2.2"
 
 ########################
 ######## ROOT ##########
@@ -90,6 +91,9 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
   && ln -sf /dev/stderr /var/log/nginx/error.log
 
 EXPOSE 80 443
+
+# Install custom PHP extensions
+RUN docker-php-ext-install -j "$(nproc)" exif
 
 # Install Google Page Speed Module for nginx
 #    https://developers.google.com/speed/pagespeed/module/build_ngx_pagespeed_from_source
@@ -218,7 +222,8 @@ RUN ~/bin/composer require \
         "drupal/slick_media ${DRUPAL_SLICK_MEDIA_VERSION}" \
         "drupal/addtoany ${DRUPAL_ADDTOANY_VERSION}" \
         "drupal/terms_of_use ${DRUPAL_TERMS_OF_USE_VERSION}" \
-        "drupal/google_analytics ${DRUPAL_GOOGLE_ANALYTICS_VERSION}"
+        "drupal/google_analytics ${DRUPAL_GOOGLE_ANALYTICS_VERSION}" \
+        "drupal/recaptcha ${DRUPAL_RECAPTCHA_VERSION}"
 
 # Install Bootstrap base theme
 RUN ~/bin/composer require \

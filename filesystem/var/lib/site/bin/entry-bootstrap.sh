@@ -233,6 +233,9 @@ function enable_required_modules {
   echo Enabling the Google Analytics module ...
   drush -y pm-enable google_analytics
 
+  echo Enabling the reCAPTCHA module ...
+  drush -y pm-enable recaptcha
+
   # If there was new config, get the database in sync
   drush -y entity-updates
 }
