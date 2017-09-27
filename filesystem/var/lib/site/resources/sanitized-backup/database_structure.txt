@@ -310,6 +310,23 @@ CREATE TABLE `cachetags` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `captcha_sessions` (
+  `csid` int(11) NOT NULL COMMENT 'CAPTCHA session ID.',
+  `token` varchar(64) DEFAULT NULL COMMENT 'One time CAPTCHA token.',
+  `uid` int(11) NOT NULL DEFAULT '0' COMMENT 'User''s users.uid.',
+  `sid` varchar(64) NOT NULL DEFAULT '' COMMENT 'Session ID of the user.',
+  `ip_address` varchar(128) DEFAULT NULL COMMENT 'IP address of the visitor.',
+  `timestamp` int(11) NOT NULL DEFAULT '0' COMMENT 'A Unix timestamp indicating when the challenge was generated.',
+  `form_id` varchar(128) NOT NULL COMMENT 'The form_id of the form where the CAPTCHA is added to.',
+  `solution` varchar(128) NOT NULL DEFAULT '' COMMENT 'Solution of the challenge.',
+  `status` int(11) NOT NULL DEFAULT '0' COMMENT 'Status of the CAPTCHA session (unsolved, solved, ...)',
+  `attempts` int(11) NOT NULL DEFAULT '0' COMMENT 'The number of attempts.',
+  PRIMARY KEY (`csid`),
+  KEY `csid_ip` (`csid`,`ip_address`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `comment` (
   `cid` int(10) unsigned NOT NULL,
   `comment_type` varchar(32) CHARACTER SET ascii NOT NULL COMMENT 'The ID of the target entity.',
@@ -384,6 +401,229 @@ CREATE TABLE `comment_field_data` (
   KEY `comment__status_comment_type` (`status`,`comment_type`,`cid`),
   KEY `comment__status_pid` (`pid`,`status`),
   KEY `comment__num_new` (`entity_id`,`entity_type`,`comment_type`,`status`,`created`,`cid`,`thread`(191))
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `config_snapshot` (
+  `collection` varchar(255) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'Primary Key: Config object collection.',
+  `name` varchar(255) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'Primary Key: Config object name.',
+  `data` longblob COMMENT 'A serialized configuration object data.',
+  PRIMARY KEY (`collection`,`name`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_data_32fc1559ab` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `field_image_width_value` int(11) NOT NULL,
+  PRIMARY KEY (`entity_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_data_57fe8e3424` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to, which for an unversioned entity type is the same as the entity id',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `forum_container_value` tinyint(4) NOT NULL,
+  PRIMARY KEY (`entity_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_data_6a9b9ae24b` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `field_image_height_value` int(11) NOT NULL,
+  PRIMARY KEY (`entity_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_data_963c1efbc0` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `comment_forum_status` int(11) NOT NULL DEFAULT '0' COMMENT 'Whether comments are allowed on this entity: 0 = no, 1 = closed (read only), 2 = open (read/write).',
+  PRIMARY KEY (`entity_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_data_b9381fc604` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `taxonomy_forums_target_id` int(10) unsigned NOT NULL COMMENT 'The ID of the target entity.',
+  PRIMARY KEY (`entity_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`),
+  KEY `taxonomy_forums_target_id` (`taxonomy_forums_target_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_data_d0f1ef90e4` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `comment_forum_status` int(11) NOT NULL DEFAULT '0' COMMENT 'Whether comments are allowed on this entity: 0 = no, 1 = closed (read only), 2 = open (read/write).',
+  PRIMARY KEY (`entity_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_data_e2dc31d992` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `taxonomy_forums_target_id` int(10) unsigned NOT NULL COMMENT 'The ID of the target entity.',
+  PRIMARY KEY (`entity_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`),
+  KEY `taxonomy_forums_target_id` (`taxonomy_forums_target_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_data_fdac66e306` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to, which for an unversioned entity type is the same as the entity id',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `forum_container_value` tinyint(4) NOT NULL,
+  PRIMARY KEY (`entity_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_revision_32fc1559ab` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `field_image_width_value` int(11) NOT NULL,
+  PRIMARY KEY (`entity_id`,`revision_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_revision_6a9b9ae24b` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `field_image_height_value` int(11) NOT NULL,
+  PRIMARY KEY (`entity_id`,`revision_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_revision_963c1efbc0` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `comment_forum_status` int(11) NOT NULL DEFAULT '0' COMMENT 'Whether comments are allowed on this entity: 0 = no, 1 = closed (read only), 2 = open (read/write).',
+  PRIMARY KEY (`entity_id`,`revision_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_revision_b9381fc604` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `taxonomy_forums_target_id` int(10) unsigned NOT NULL COMMENT 'The ID of the target entity.',
+  PRIMARY KEY (`entity_id`,`revision_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`),
+  KEY `taxonomy_forums_target_id` (`taxonomy_forums_target_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_revision_d0f1ef90e4` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `comment_forum_status` int(11) NOT NULL DEFAULT '0' COMMENT 'Whether comments are allowed on this entity: 0 = no, 1 = closed (read only), 2 = open (read/write).',
+  PRIMARY KEY (`entity_id`,`revision_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `field_deleted_revision_e2dc31d992` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `taxonomy_forums_target_id` int(10) unsigned NOT NULL COMMENT 'The ID of the target entity.',
+  PRIMARY KEY (`entity_id`,`revision_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`),
+  KEY `taxonomy_forums_target_id` (`taxonomy_forums_target_id`)
 );
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -560,6 +800,71 @@ CREATE TABLE `media` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `media__field_file_mime` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `field_file_mime_value` varchar(255) NOT NULL,
+  PRIMARY KEY (`entity_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `media__field_image` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `field_image_target_id` int(10) unsigned NOT NULL COMMENT 'The ID of the file entity.',
+  `field_image_alt` varchar(512) DEFAULT NULL COMMENT 'Alternative image text, for the image''s ''alt'' attribute.',
+  `field_image_title` varchar(1024) DEFAULT NULL COMMENT 'Image title text, for the image''s ''title'' attribute.',
+  `field_image_width` int(10) unsigned DEFAULT NULL COMMENT 'The width of the image in pixels.',
+  `field_image_height` int(10) unsigned DEFAULT NULL COMMENT 'The height of the image in pixels.',
+  PRIMARY KEY (`entity_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`),
+  KEY `field_image_target_id` (`field_image_target_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `media__field_image_height` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `field_image_height_value` int(11) NOT NULL,
+  PRIMARY KEY (`entity_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `media__field_image_width` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `field_image_width_value` int(11) NOT NULL,
+  PRIMARY KEY (`entity_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `media_field_data` (
   `mid` int(10) unsigned NOT NULL,
   `vid` int(10) unsigned NOT NULL,
@@ -619,6 +924,71 @@ CREATE TABLE `media_revision` (
   PRIMARY KEY (`vid`),
   KEY `media__mid` (`mid`),
   KEY `media_field__revision_uid__target_id` (`revision_uid`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `media_revision__field_file_mime` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `field_file_mime_value` varchar(255) NOT NULL,
+  PRIMARY KEY (`entity_id`,`revision_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `media_revision__field_image` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `field_image_target_id` int(10) unsigned NOT NULL COMMENT 'The ID of the file entity.',
+  `field_image_alt` varchar(512) DEFAULT NULL COMMENT 'Alternative image text, for the image''s ''alt'' attribute.',
+  `field_image_title` varchar(1024) DEFAULT NULL COMMENT 'Image title text, for the image''s ''title'' attribute.',
+  `field_image_width` int(10) unsigned DEFAULT NULL COMMENT 'The width of the image in pixels.',
+  `field_image_height` int(10) unsigned DEFAULT NULL COMMENT 'The height of the image in pixels.',
+  PRIMARY KEY (`entity_id`,`revision_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`),
+  KEY `field_image_target_id` (`field_image_target_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `media_revision__field_image_height` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `field_image_height_value` int(11) NOT NULL,
+  PRIMARY KEY (`entity_id`,`revision_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
+);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `media_revision__field_image_width` (
+  `bundle` varchar(128) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The field instance bundle to which this row belongs, used when deleting a field instance',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'A boolean indicating whether this data item has been deleted',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'The entity id this data is attached to',
+  `revision_id` int(10) unsigned NOT NULL COMMENT 'The entity revision id this data is attached to',
+  `langcode` varchar(32) CHARACTER SET ascii NOT NULL DEFAULT '' COMMENT 'The language code for this data item.',
+  `delta` int(10) unsigned NOT NULL COMMENT 'The sequence number for this data item, used for multi-value fields',
+  `field_image_width_value` int(11) NOT NULL,
+  PRIMARY KEY (`entity_id`,`revision_id`,`deleted`,`delta`,`langcode`),
+  KEY `bundle` (`bundle`),
+  KEY `revision_id` (`revision_id`)
 );
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
