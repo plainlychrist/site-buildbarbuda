@@ -40,7 +40,8 @@ ENV NGINX_VERSION="1.13.3-1~jessie" \
     DRUPAL_TERMS_OF_USE_VERSION="~2.0@dev" \
     DRUPAL_RECAPTCHA_VERSION="~2.2" \
     DRUPAL_GOOGLE_ANALYTICS_VERSION="~2.2" \
-    DRUPAL_WEBFORM_VERSION="~5.0"
+    DRUPAL_WEBFORM_VERSION="~5.0" \
+    DRUPAL_CONFIG_IGNORE_VERSION="~2.0"
 
 ########################
 ######## ROOT ##########
@@ -225,7 +226,8 @@ RUN ~/bin/composer require \
         "drupal/terms_of_use ${DRUPAL_TERMS_OF_USE_VERSION}" \
         "drupal/google_analytics ${DRUPAL_GOOGLE_ANALYTICS_VERSION}" \
         "drupal/recaptcha ${DRUPAL_RECAPTCHA_VERSION}" \
-        "drupal/webform ${DRUPAL_WEBFORM_VERSION}"
+        "drupal/webform ${DRUPAL_WEBFORM_VERSION}" \
+        "drupal/config_ignore ${DRUPAL_CONFIG_IGNORE_VERSION}"
 
 # Install Bootstrap base theme
 RUN ~/bin/composer require \

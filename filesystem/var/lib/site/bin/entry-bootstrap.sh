@@ -239,6 +239,9 @@ function enable_required_modules {
   echo Enabling the Webform module ...
   drush -y pm-enable webform
 
+  echo Enabling the Config Ignore module ...
+  drush -y pm-enable config_ignore
+
   # If there was new config, get the database in sync
   drush -y entity-updates
 }
@@ -297,9 +300,9 @@ if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
   generate_settings_file_config >> ${SETTINGS}
 
   if [[ $DATABASE_WRITER -eq 1 ]]; then
-    # Merge any new config into the existing active config (if any)
-    echo Merging new configuration ...
-    rsync --archive --ignore-existing --verbose ${MERGE_CONFIG}/ ${STORAGE_CONFIG}/active
+    # Allow admin to go to /admin/config/development/configuration and synchronize the new configuration
+    echo Replacing configuration synchronization directory ...
+    rsync --archive --delete-after --verbose ${MERGE_CONFIG}/ ${STORAGE_CONFIG}/sync
 
     # Verify settings are good (this is just visual)
     drush core-status
@@ -308,10 +311,8 @@ if [[ $HAVE_STORED_CONFIG -eq 1 ]]; then
     drush sql-query "UPDATE users_field_data SET name='admin', status=1 WHERE uid=1;"
     drush user-password admin --password="${WEB_ADMIN_PASSWORD}"
 
-    # enable all required modules
-    enable_required_modules
-
-    # Reset drupal caches
+    # Reset drupal caches ... starting at Docker container boot, we can be in weird initial states especially
+    # if persistent volumes are mounted
     drush cache-rebuild
 
     # Say the winner (the "writer") is completed
@@ -349,6 +350,12 @@ else
     --site-mail=no-reply@buildbarbuda.org \
     --verbose \
     standard install_configure_form.update_status_module='array(FALSE,FALSE)'
+
+  # enable all required modules
+  enable_required_modules
+
+  # Reset drupal caches
+  drush cache-rebuild
 fi
 
 if [[ $USE_SQLITE -eq 1 ]]; then
