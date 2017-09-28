@@ -209,6 +209,11 @@ RUN ~/bin/drush dl config_installer
 # Install AddToAny
 # Install Terms of Use
 # Install Google Analytics
+# Install reCAPTCHA
+# Install Webform
+# Install Config Ignore
+# Install File Browser
+ENV DRUPAL_FILE_BROWSER_VERSION="1.1"
 RUN ~/bin/composer require \
         "drupal/video_embed_field ${VIDEO_EMBED_FIELD_VERSION}" \
         "drupal/backup_db ${DRUPAL_BACKUP_DB_VERSION}" \
@@ -227,7 +232,8 @@ RUN ~/bin/composer require \
         "drupal/google_analytics ${DRUPAL_GOOGLE_ANALYTICS_VERSION}" \
         "drupal/recaptcha ${DRUPAL_RECAPTCHA_VERSION}" \
         "drupal/webform ${DRUPAL_WEBFORM_VERSION}" \
-        "drupal/config_ignore ${DRUPAL_CONFIG_IGNORE_VERSION}"
+        "drupal/config_ignore ${DRUPAL_CONFIG_IGNORE_VERSION}" \
+        "drupal/file_browser ${DRUPAL_FILE_BROWSER_VERSION}"
 
 # Install Bootstrap base theme
 RUN ~/bin/composer require \
@@ -255,10 +261,13 @@ COPY filesystem/etc/ /etc/
 COPY filesystem/usr/local/etc/ /usr/local/etc/
 RUN rm -f /usr/local/etc/php-fpm.d/zz-docker.conf
 
-# External libraries: http://cgit.drupalcode.org/views_slideshow/tree/README.txt
+# External libraries
+#   http://cgit.drupalcode.org/views_slideshow/tree/README.txt
 RUN mkdir -p libraries/jquery.cycle && cd libraries/jquery.cycle && curl -LO https://malsup.github.io/jquery.cycle.all.js \
     && mkdir -p ../../libraries/jquery.hoverIntent && cd ../../libraries/jquery.hoverIntent && curl -LO http://cherne.net/brian/resources/jquery.hoverIntent.js \
     && mkdir -p ../../libraries/json2 && cd ../../libraries/json2 && curl -LO https://raw.githubusercontent.com/douglascrockford/JSON-js/master/json2.js
+#   https://drupal.org/project/file_browser
+RUN cd libraries && git clone https://github.com/enyo/dropzone.git && git clone https://github.com/desandro/imagesloaded.git && git clone https://github.com/desandro/masonry.git
 
 # Initial configuration for the 'all' site ...
 COPY filesystem/var/www/html/ /var/www/html
