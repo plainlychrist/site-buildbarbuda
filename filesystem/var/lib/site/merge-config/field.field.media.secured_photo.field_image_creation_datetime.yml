@@ -1,0 +1,21 @@
+uuid: 71696342-cabc-4960-9b6f-c5cdc53c373c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_image_creation_datetime
+    - media_entity.bundle.secured_photo
+id: media.secured_photo.field_image_creation_datetime
+field_name: field_image_creation_datetime
+entity_type: media
+bundle: secured_photo
+label: 'Image creation datetime'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 1506504819
+default_value_callback: ''
+settings: {  }
+field_type: timestamp

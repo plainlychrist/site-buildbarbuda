@@ -1,19 +1,19 @@
-uuid: 1215e8a0-649f-46a7-91dd-349f4179932b
+uuid: 16cbac46-4d0b-4f31-adf6-0989e88e9e0e
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.media.field_image
-    - media_entity.bundle.image_bundle
+    - field.storage.media.field_secured_photo
+    - media_entity.bundle.secured_photo
   module:
     - image
-id: media.image_bundle.field_image
-field_name: field_image
+id: media.secured_photo.field_secured_photo
+field_name: field_secured_photo
 entity_type: media
-bundle: image_bundle
-label: Image
+bundle: secured_photo
+label: Photo
 description: ''
-required: true
+required: false
 translatable: false
 default_value: {  }
 default_value_callback: ''
@@ -23,8 +23,8 @@ settings:
   max_filesize: ''
   max_resolution: ''
   min_resolution: ''
-  alt_field: true
-  alt_field_required: true
+  alt_field: false
+  alt_field_required: false
   title_field: false
   title_field_required: false
   default_image:

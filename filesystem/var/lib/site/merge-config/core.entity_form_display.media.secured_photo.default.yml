@@ -1,0 +1,65 @@
+uuid: c5fa85c7-5e81-4b6f-bb09-7e549f786792
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.media.secured_photo.field_aperture_value
+    - field.field.media.secured_photo.field_camera_iso
+    - field.field.media.secured_photo.field_camera_model
+    - field.field.media.secured_photo.field_exposure_time
+    - field.field.media.secured_photo.field_focal_length
+    - field.field.media.secured_photo.field_image_creation_datetime
+    - field.field.media.secured_photo.field_image_height
+    - field.field.media.secured_photo.field_image_width
+    - field.field.media.secured_photo.field_mime_type
+    - field.field.media.secured_photo.field_secured_photo
+    - image.style.thumbnail
+    - media_entity.bundle.secured_photo
+  module:
+    - image
+id: media.secured_photo.default
+targetEntityType: media
+bundle: secured_photo
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_secured_photo:
+    weight: 3
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+    type: image_image
+    region: content
+  name:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 1
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    region: content
+    third_party_settings: {  }
+hidden:
+  field_aperture_value: true
+  field_camera_iso: true
+  field_camera_model: true
+  field_exposure_time: true
+  field_focal_length: true
+  field_image_creation_datetime: true
+  field_image_height: true
+  field_image_width: true
+  field_mime_type: true

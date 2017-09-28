@@ -56,7 +56,7 @@ settings:
           height: '480'
 image_upload:
   status: true
-  scheme: private
+  scheme: public
   directory: inline-images
   max_size: ''
   max_dimensions:

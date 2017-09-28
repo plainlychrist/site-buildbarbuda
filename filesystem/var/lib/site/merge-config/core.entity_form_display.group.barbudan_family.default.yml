@@ -1,0 +1,38 @@
+uuid: a6161487-70ff-4ef8-98ba-4854ea687dc5
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.group.barbudan_family.field_family_email
+    - group.type.barbudan_family
+  module:
+    - path
+id: group.barbudan_family.default
+targetEntityType: group
+bundle: barbudan_family
+mode: default
+content:
+  field_family_email:
+    weight: 2
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: email_default
+    region: content
+  label:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  uid: true

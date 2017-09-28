@@ -1,4 +1,4 @@
-uuid: 4151f282-32d1-464d-9efe-1a432e2414f1
+uuid: 44482fd6-1885-4ad4-bdb1-c6f7c1038f49
 langcode: en
 status: true
 dependencies:
@@ -7,8 +7,8 @@ dependencies:
     - system.menu.main
   module:
     - group
-id: barbudan_families
-label: 'Barbudan Families'
+id: families
+label: Families
 module: views
 description: ''
 tag: ''
@@ -154,7 +154,7 @@ display:
           entity_field: type
           plugin_id: bundle
       sorts: {  }
-      title: 'Barbudan Families'
+      title: Families
       header:
         area:
           id: area
@@ -191,12 +191,16 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      path: barbudan-families
+      path: families
       menu:
         type: normal
-        title: 'Barbudan Families'
-        menu_name: main
+        title: Families
+        description: ''
+        expanded: false
+        parent: ''
         weight: -49
+        context: '0'
+        menu_name: main
     cache_metadata:
       max-age: -1
       contexts:

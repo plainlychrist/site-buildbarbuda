@@ -1,0 +1,78 @@
+uuid: fc0c31fc-45a6-42ca-8334-87932c81953c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.media.secured_photo.field_aperture_value
+    - field.field.media.secured_photo.field_camera_iso
+    - field.field.media.secured_photo.field_camera_model
+    - field.field.media.secured_photo.field_exposure_time
+    - field.field.media.secured_photo.field_focal_length
+    - field.field.media.secured_photo.field_image_creation_datetime
+    - field.field.media.secured_photo.field_image_height
+    - field.field.media.secured_photo.field_image_width
+    - field.field.media.secured_photo.field_mime_type
+    - field.field.media.secured_photo.field_secured_photo
+    - image.style.thumbnail
+    - media_entity.bundle.secured_photo
+  module:
+    - image
+    - user
+id: media.secured_photo.default
+targetEntityType: media
+bundle: secured_photo
+mode: default
+content:
+  created:
+    label: hidden
+    type: timestamp
+    weight: 2
+    region: content
+    settings:
+      date_format: medium
+      custom_date_format: ''
+      timezone: ''
+    third_party_settings: {  }
+  field_secured_photo:
+    weight: 4
+    label: above
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
+    type: image
+    region: content
+  name:
+    label: hidden
+    type: string
+    weight: 0
+    region: content
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  thumbnail:
+    type: image
+    weight: 3
+    label: inline
+    settings:
+      image_style: thumbnail
+      image_link: ''
+    region: content
+    third_party_settings: {  }
+  uid:
+    label: hidden
+    type: author
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  field_aperture_value: true
+  field_camera_iso: true
+  field_camera_model: true
+  field_exposure_time: true
+  field_focal_length: true
+  field_image_creation_datetime: true
+  field_image_height: true
+  field_image_width: true
+  field_mime_type: true

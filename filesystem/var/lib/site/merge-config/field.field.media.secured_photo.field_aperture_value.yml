@@ -1,0 +1,19 @@
+uuid: 81c0ae0e-aa84-4a02-b353-7391b3daa70d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_aperture_value
+    - media_entity.bundle.secured_photo
+id: media.secured_photo.field_aperture_value
+field_name: field_aperture_value
+entity_type: media
+bundle: secured_photo
+label: 'Aperture value'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

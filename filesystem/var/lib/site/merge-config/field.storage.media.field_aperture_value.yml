@@ -1,11 +1,11 @@
-uuid: ee397891-8e1a-40b0-b7da-d406000af61b
+uuid: a918a4fe-1e8c-4c31-a6f2-66a8f1afcc4f
 langcode: en
 status: true
 dependencies:
   module:
     - media_entity
-id: media.field_file_mime
-field_name: field_file_mime
+id: media.field_aperture_value
+field_name: field_aperture_value
 entity_type: media
 type: string
 settings:

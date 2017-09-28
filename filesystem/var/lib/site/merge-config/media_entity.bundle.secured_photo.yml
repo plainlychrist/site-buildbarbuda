@@ -1,0 +1,25 @@
+uuid: 0615792f-fbd5-4bb7-a1a8-8c2efea957be
+langcode: en
+status: true
+dependencies:
+  module:
+    - media_entity_image
+id: secured_photo
+label: 'Secured Photo'
+description: 'Use a Secured Photo to upload your own photograph to the buildbarbuda.org site. Only you, your family and your family friends will be able to see the photographs.'
+type: image
+queue_thumbnail_downloads: false
+new_revision: false
+type_configuration:
+  source_field: field_secured_photo
+  gather_exif: true
+field_map:
+  mime: field_mime_type
+  width: field_image_width
+  height: field_image_height
+  model: field_camera_model
+  created: field_image_creation_datetime
+  iso: field_camera_iso
+  exposure: field_exposure_time
+  aperture: field_aperture_value
+  focal_length: field_focal_length

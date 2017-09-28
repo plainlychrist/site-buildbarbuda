@@ -1,18 +1,18 @@
-uuid: 3173f40d-106f-4601-a589-94895da0ccb5
+uuid: 848693fd-6f9a-4167-a3fa-937f0b81abb2
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.media.field_image_height
-    - media_entity.bundle.image_bundle
-id: media.image_bundle.field_image_height
+    - media_entity.bundle.secured_photo
+id: media.secured_photo.field_image_height
 field_name: field_image_height
 entity_type: media
-bundle: image_bundle
+bundle: secured_photo
 label: 'Image Height'
 description: ''
 required: false
-translatable: false
+translatable: true
 default_value: {  }
 default_value_callback: ''
 settings:

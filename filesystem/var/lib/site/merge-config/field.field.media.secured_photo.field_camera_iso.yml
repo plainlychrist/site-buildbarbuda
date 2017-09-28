@@ -1,0 +1,19 @@
+uuid: dccd79cf-865a-41d4-90ed-f5c418cad032
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_camera_iso
+    - media_entity.bundle.secured_photo
+id: media.secured_photo.field_camera_iso
+field_name: field_camera_iso
+entity_type: media
+bundle: secured_photo
+label: 'Camera ISO'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

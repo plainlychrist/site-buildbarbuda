@@ -1,0 +1,19 @@
+uuid: 6c8556bc-dd2d-4f49-a59a-a339c88abfcf
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_exposure_time
+    - media_entity.bundle.secured_photo
+id: media.secured_photo.field_exposure_time
+field_name: field_exposure_time
+entity_type: media
+bundle: secured_photo
+label: 'Exposure time'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

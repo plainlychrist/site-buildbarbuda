@@ -1,0 +1,18 @@
+uuid: 8713a0c4-8553-428a-9152-5ecf836a7bae
+langcode: en
+status: true
+dependencies:
+  module:
+    - media_entity
+id: media.field_image_creation_datetime
+field_name: field_image_creation_datetime
+entity_type: media
+type: timestamp
+settings: {  }
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

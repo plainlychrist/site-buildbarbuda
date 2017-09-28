@@ -1,0 +1,21 @@
+uuid: a47922f0-bd9a-4dc8-bf55-f3ef8ecbf1b1
+langcode: en
+status: true
+dependencies:
+  module:
+    - media_entity
+id: media.field_camera_iso
+field_name: field_camera_iso
+entity_type: media
+type: string
+settings:
+  max_length: 255
+  is_ascii: false
+  case_sensitive: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

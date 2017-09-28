@@ -1,18 +1,18 @@
-uuid: b93f2615-eb0f-4954-add9-ae0befd8fab1
+uuid: f796f8f8-ccbe-4f36-a588-4c41ff18a8a8
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.media.field_image_width
-    - media_entity.bundle.image_bundle
-id: media.image_bundle.field_image_width
+    - media_entity.bundle.secured_photo
+id: media.secured_photo.field_image_width
 field_name: field_image_width
 entity_type: media
-bundle: image_bundle
+bundle: secured_photo
 label: 'Image Width'
 description: ''
 required: false
-translatable: false
+translatable: true
 default_value: {  }
 default_value_callback: ''
 settings:

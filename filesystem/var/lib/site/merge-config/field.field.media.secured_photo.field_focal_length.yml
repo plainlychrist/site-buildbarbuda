@@ -1,0 +1,19 @@
+uuid: 3345e468-8164-4e57-8f8d-3e36243c344b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_focal_length
+    - media_entity.bundle.secured_photo
+id: media.secured_photo.field_focal_length
+field_name: field_focal_length
+entity_type: media
+bundle: secured_photo
+label: 'Focal length'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

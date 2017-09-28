@@ -1,0 +1,21 @@
+uuid: 861d81a8-a734-4fbd-baa8-6247154ebeef
+langcode: en
+status: true
+dependencies:
+  module:
+    - media_entity
+id: media.field_camera_model
+field_name: field_camera_model
+entity_type: media
+type: string
+settings:
+  max_length: 255
+  is_ascii: false
+  case_sensitive: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

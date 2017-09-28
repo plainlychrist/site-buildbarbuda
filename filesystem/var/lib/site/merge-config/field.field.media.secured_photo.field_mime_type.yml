@@ -1,0 +1,19 @@
+uuid: ce943dc7-0204-454b-b169-3b58d45d57a3
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_mime_type
+    - media_entity.bundle.secured_photo
+id: media.secured_photo.field_mime_type
+field_name: field_mime_type
+entity_type: media
+bundle: secured_photo
+label: 'MIME Type'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
