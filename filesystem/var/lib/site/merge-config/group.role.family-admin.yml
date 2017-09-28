@@ -3,13 +3,13 @@ langcode: en
 status: true
 dependencies:
   config:
-    - group.type.barbudan_family
-id: barbudan_family-admin
+    - group.type.family
+id: family-admin
 label: Admin
 weight: 100
 internal: false
 audience: member
-group_type: barbudan_family
+group_type: family
 permissions_ui: true
 permissions:
   - 'access content overview'

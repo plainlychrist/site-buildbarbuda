@@ -2,10 +2,10 @@ uuid: 3afc8f84-561d-493a-a5a0-9e51b3e3f651
 langcode: en
 status: true
 dependencies: {  }
-id: barbudan_family
+id: family
 label: Family
 description: "A family that has one or more of its family members living in Barbuda.\r\n\r\nThe name of the family should be *singular* and only a single word. For example, the name of the family is \"Deazle\", not \"Deazles\" or \"The Deazles\".\r\n\r\nYou can be a member of a family through your mother or your father ... so we allow you to register yourselves with a maximum of 2 families."
 creator_membership: true
 creator_wizard: true
 creator_roles:
-  - barbudan_family-admin
+  - family-admin

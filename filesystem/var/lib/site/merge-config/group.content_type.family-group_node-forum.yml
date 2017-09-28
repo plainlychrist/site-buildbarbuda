@@ -3,15 +3,15 @@ langcode: en
 status: true
 dependencies:
   config:
-    - group.type.barbudan_family
+    - group.type.family
     - node.type.forum
   module:
     - gnode
     - node
-id: barbudan_family-group_node-forum
+id: family-group_node-forum
 label: 'Barbudan Family: Group node (Forum topic)'
 description: 'Adds <em class="placeholder">Forum topic</em> content to groups both publicly and privately.'
-group_type: barbudan_family
+group_type: family
 content_plugin: 'group_node:forum'
 plugin_config:
   group_cardinality: 1

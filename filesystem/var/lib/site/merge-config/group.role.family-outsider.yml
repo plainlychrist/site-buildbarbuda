@@ -3,12 +3,12 @@ langcode: en
 status: true
 dependencies:
   config:
-    - group.type.barbudan_family
-id: barbudan_family-outsider
+    - group.type.family
+id: family-outsider
 label: Outsider
 weight: -101
 internal: true
 audience: outsider
-group_type: barbudan_family
+group_type: family
 permissions_ui: true
 permissions: {  }

@@ -3,13 +3,13 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.group.barbudan_family.field_family_email
-    - group.type.barbudan_family
+    - field.field.group.family.field_family_email
+    - group.type.family
   module:
     - path
-id: group.barbudan_family.default
+id: group.family.default
 targetEntityType: group
-bundle: barbudan_family
+bundle: family
 mode: default
 content:
   field_family_email:

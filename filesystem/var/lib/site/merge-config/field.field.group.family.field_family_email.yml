@@ -4,11 +4,11 @@ status: true
 dependencies:
   config:
     - field.storage.group.field_family_email
-    - group.type.barbudan_family
-id: group.barbudan_family.field_family_email
+    - group.type.family
+id: group.family.field_family_email
 field_name: field_family_email
 entity_type: group
-bundle: barbudan_family
+bundle: family
 label: 'Family Email'
 description: "Anyone using this website can send your family a message. The email address you choose here will be where those messages will be sent.\r\n\r\nYou can use your personal email address. Your email address will be hidden; only family and friends can see it.\r\n\r\nPro Tip: You can make a free email address for your entire family ... just try <a href=\"https://support.google.com/groups/answer/2464926?hl=en\">Google Groups: Creating a group email</a>"
 required: true

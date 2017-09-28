@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
-    - group.type.barbudan_family
+    - group.type.family
     - system.menu.main
   module:
     - group
@@ -149,7 +149,7 @@ display:
           table: groups_field_data
           field: type
           value:
-            barbudan_family: barbudan_family
+            family: family
           entity_type: group
           entity_field: type
           plugin_id: bundle

@@ -3,15 +3,15 @@ langcode: en
 status: true
 dependencies:
   config:
-    - group.type.barbudan_family
+    - group.type.family
   enforced:
     config:
       - user.role.administrator
-id: barbudan_family-a416e6833
+id: family-a416e6833
 label: Administrator
 weight: 2
 internal: true
 audience: outsider
-group_type: barbudan_family
+group_type: family
 permissions_ui: false
 permissions: {  }

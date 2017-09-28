@@ -3,12 +3,12 @@ langcode: en
 status: true
 dependencies:
   config:
-    - group.type.barbudan_family
-id: barbudan_family-member
+    - group.type.family
+id: family-member
 label: Member
 weight: -100
 internal: true
 audience: member
-group_type: barbudan_family
+group_type: family
 permissions_ui: true
 permissions: {  }
