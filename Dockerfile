@@ -57,6 +57,7 @@ ENV NGINX_VERSION="1.13.3-1~jessie" \
 # Install ruby and ruby-dev for 'gem install sass'
 # Install self-signed SSL (auto-generated) for HTTPS
 # Install supervisor so we can run multiple processes in one container
+# Install unzip so 'drush webform-libraries-download' works
 RUN apt-get -y update && \
     echo "postfix postfix/mailname string replaceme.hostname.com" | debconf-set-selections && \
     echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && \
@@ -70,7 +71,8 @@ RUN apt-get -y update && \
         postfix \
         sqlite3 \
         ssl-cert openssl-blacklist \
-        supervisor && \
+        supervisor \
+        unzip && \
     gem install sass
 
 ############## Nginx 1.13.5
@@ -126,14 +128,7 @@ RUN set -x \
   && install -pv ./objs/ngx_pagespeed.so /etc/nginx/modules/  \
   && cd \
   && rm -rf release-${NPS_VERSION}-${NPS_STREAM}.zip ngx_pagespeed-release-${NPS_VERSION}-${NPS_STREAM}/ nginx-${NGINX_VERSION}.tar.gz nginx-${NGINX_VERSION}/ \
-  && apt-get remove -y build-essential zlib1g-dev libpcre3-dev unzip
-
-# Clean up space and unneeded packages
-##########
-
-RUN apt-get autoremove -y && \
-        apt-get clean && \
-        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  && apt-get remove -y build-essential zlib1g-dev libpcre3-dev 
 
 # Get rid of PHP extensions we don't need
 ##########
@@ -186,6 +181,19 @@ RUN ln -s ~/.composer/vendor/bin/drush ~/bin/
 
 # Test your install.
 RUN ~/bin/drush core-status
+
+# Install Webform libraries
+#  We need a Drupal installation to do this :(
+#   https://www.drupal.org/docs/8/modules/webform/webform-libraries
+USER root
+RUN rsync -ap sites/default/ sites/default-moveback && \
+    install -o drupaladmin -g www-data -d /tmp/webform-libraries-sqlite && \
+    ~drupaladmin/bin/drush -y site-install --db-url="sqlite:///tmp/webform-libraries-sqlite/.ht.sqlite" && \
+    ~drupaladmin/bin/drush en webform -y && \
+    ~drupaladmin/bin/drush webform-libraries-download && \
+    rm -rf /tmp/webform-libraries-sqlite sites/default && \
+    mv sites/default-moveback sites/default
+USER drupaladmin
 
 # Modules
 #   To mitigate docker build running out of memory, we split up the composer require commands
@@ -254,6 +262,13 @@ RUN ~/bin/composer clear-cache
 
 USER root
 
+# Clean up space and unneeded packages
+##########
+
+RUN apt-get autoremove -y && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 # Configuration
 #########
 
@@ -287,7 +302,7 @@ RUN install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/all/themes/
 # Clean up space and unneeded packages (we don't need SASS and hence Ruby anymore)
 
 RUN gem cleanup all && \
-        apt-get -y remove ruby && \
+        apt-get -y remove ruby unzip && \
         apt-get autoremove -y && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

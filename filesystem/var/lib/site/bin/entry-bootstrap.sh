@@ -238,6 +238,7 @@ function enable_required_modules {
 
   echo Enabling the Webform module ...
   drush -y pm-enable webform
+  drush -y pm-enable webform_bootstrap
 
   echo Enabling the Config Ignore module ...
   drush -y pm-enable config_ignore
@@ -253,7 +254,7 @@ function enable_required_modules {
 generate_services_file_config
 
 HAVE_STORED_CONFIG=1
-if [[ ! -e ${MERGE_CONFIG}/system.site.yml ]]; then # there is no Docker mount to a 'git' workspace
+if [[ ! -e ${STORAGE_CONFIG}/active/system.site.yml ]]; then # there is no Docker mount to a 'git' workspace
   HAVE_STORED_CONFIG=0
 fi
 install -d ${STORAGE_CONFIG}
