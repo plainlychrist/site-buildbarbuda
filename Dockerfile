@@ -283,6 +283,8 @@ RUN mkdir -p libraries/jquery.cycle && cd libraries/jquery.cycle && curl -LO htt
     && mkdir -p ../../libraries/json2 && cd ../../libraries/json2 && curl -LO https://raw.githubusercontent.com/douglascrockford/JSON-js/master/json2.js
 #   https://drupal.org/project/file_browser
 RUN cd libraries && git clone https://github.com/enyo/dropzone.git && git clone https://github.com/desandro/imagesloaded.git && git clone https://github.com/desandro/masonry.git
+#   https://www.drupal.org/project/slick
+RUN cd libraries && git clone https://github.com/kenwheeler/slick.git && git clone https://github.com/gdsmith/jquery.easing.git
 
 # Initial configuration for the 'all' site ...
 COPY filesystem/var/www/html/ /var/www/html
