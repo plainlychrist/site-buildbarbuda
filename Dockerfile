@@ -20,7 +20,6 @@ WORKDIR /var/www/html
 # NPS: https://developers.google.com/speed/pagespeed/module/release_notes
 ENV NGINX_VERSION="1.13.3-1~jessie" \
     DRUSH_MAJOR_VERSION="8" \
-    VIDEO_EMBED_FIELD_VERSION="~1.5" \
     DRUPAL_BACKUP_DB_VERSION="~1.2" \
     DRUPAL_ADVAGG_VERSION="~3.2" \
     DRUPAL_BOOTSTRAP_VERSION="~3.6" \
@@ -36,12 +35,20 @@ ENV NGINX_VERSION="1.13.3-1~jessie" \
     DRUPAL_DS_VERSION="~3.1" \
     DRUPAL_ADDTOANY_VERSION="~1.8" \
     DRUPAL_GOOGLE_MAP_FIELD_VERSION="~1.4" \
-    DRUPAL_SLICK_MEDIA_VERSION="~1.0" \
     DRUPAL_TERMS_OF_USE_VERSION="~2.0@dev" \
     DRUPAL_RECAPTCHA_VERSION="~2.2" \
     DRUPAL_GOOGLE_ANALYTICS_VERSION="~2.2" \
     DRUPAL_WEBFORM_VERSION="~5.0" \
-    DRUPAL_CONFIG_IGNORE_VERSION="~2.0"
+    DRUPAL_CONFIG_IGNORE_VERSION="~2.0" \
+    DRUPAL_SLICK_MEDIA_VERSION="~1.0" \
+    DRUPAL_VIDEO_EMBED_FIELD_VERSION="~1.5" \
+    DRUPAL_FILE_BROWSER_VERSION="1.1" \
+    DRUPAL_MEDIA_ENTITY_DOCUMENT_VERSION="~1.1" \
+    DRUPAL_MEDIA_ENTITY_SLIDESHOW_VERSION="~1.2" \
+    DRUPAL_MEDIA_ENTITY_INSTAGRAM_VERSION="~1.4" \
+    DRUPAL_MEDIA_ENTITY_TWITTER_VERSION="~1.3" \
+    DRUPAL_IMAGE_WIDGET_CROP_VERSION="~2.0" \
+    DRUPAL_INLINE_ENTITY_FORM_VERSION="~1.0"
 
 ########################
 ######## ROOT ##########
@@ -202,7 +209,6 @@ USER drupaladmin
 # config_installer: Because of bug https://www.drupal.org/node/1613424, we need this custom install profile
 RUN ~/bin/drush dl config_installer
 
-# Install Video Embed Field
 # Install Backup and Migrate
 # Install Advanced CSS/JS Aggregation
 # Install Security Review
@@ -213,17 +219,23 @@ RUN ~/bin/drush dl config_installer
 # Install Views Slideshow
 # Install Display Suite
 # Install Google Map Field
-# Install Slick Media
 # Install AddToAny
 # Install Terms of Use
 # Install Google Analytics
 # Install reCAPTCHA
 # Install Webform
 # Install Config Ignore
-# Install File Browser
-ENV DRUPAL_FILE_BROWSER_VERSION="1.1"
+# Install Media (from https://github.com/drupal-media/media pre-8.4)
+#   Install Slick Media
+#   Install Video Embed Field
+#   Install File Browser
+#   Install Media Entity Slideshow
+#   Install Media Entity Instagram
+#   Install Media Entity Twitter
+#   Install Media Entity Document
+#   Install Image Widget Crop
+# Install Inline Entity Form (from https://drupal-media.gitbooks.io/drupal8-guide/content/modules/media/installation.html)
 RUN ~/bin/composer require \
-        "drupal/video_embed_field ${VIDEO_EMBED_FIELD_VERSION}" \
         "drupal/backup_db ${DRUPAL_BACKUP_DB_VERSION}" \
         "drupal/advagg ${DRUPAL_ADVAGG_VERSION}" \
         "drupal/security_review ${DRUPAL_SECURITY_REVIEW_VERSION}" \
@@ -234,14 +246,24 @@ RUN ~/bin/composer require \
         "drupal/views_slideshow ${DRUPAL_VIEWS_SLIDESHOW_VERSION}" \
         "drupal/ds ${DRUPAL_DS_VERSION}" \
         "drupal/google_map_field ${DRUPAL_GOOGLE_MAP_FIELD_VERSION}" \
-        "drupal/slick_media ${DRUPAL_SLICK_MEDIA_VERSION}" \
         "drupal/addtoany ${DRUPAL_ADDTOANY_VERSION}" \
         "drupal/terms_of_use ${DRUPAL_TERMS_OF_USE_VERSION}" \
         "drupal/google_analytics ${DRUPAL_GOOGLE_ANALYTICS_VERSION}" \
         "drupal/recaptcha ${DRUPAL_RECAPTCHA_VERSION}" \
         "drupal/webform ${DRUPAL_WEBFORM_VERSION}" \
         "drupal/config_ignore ${DRUPAL_CONFIG_IGNORE_VERSION}" \
-        "drupal/file_browser ${DRUPAL_FILE_BROWSER_VERSION}"
+        "drupal/slick_media ${DRUPAL_SLICK_MEDIA_VERSION}" \
+        "drupal/video_embed_field ${DRUPAL_VIDEO_EMBED_FIELD_VERSION}" \
+        "drupal/file_browser ${DRUPAL_FILE_BROWSER_VERSION}" \
+        "drupal/media_entity_document ${DRUPAL_MEDIA_ENTITY_DOCUMENT_VERSION}" \
+        "drupal/media_entity_slideshow ${DRUPAL_MEDIA_ENTITY_SLIDESHOW_VERSION}" \
+        "drupal/media_entity_instagram ${DRUPAL_MEDIA_ENTITY_INSTAGRAM_VERSION}" \
+        "drupal/media_entity_twitter ${DRUPAL_MEDIA_ENTITY_TWITTER_VERSION}" \
+        "drupal/image_widget_crop ${DRUPAL_IMAGE_WIDGET_CROP_VERSION}" \
+        "drupal/inline_entity_form ${DRUPAL_INLINE_ENTITY_FORM_VERSION}"
+
+# Install Drupal 8 (pre-8.4) media module
+RUN cd modules && git clone https://github.com/drupal-media/media.git
 
 # Install Bootstrap base theme
 RUN ~/bin/composer require \
@@ -285,6 +307,8 @@ RUN mkdir -p libraries/jquery.cycle && cd libraries/jquery.cycle && curl -LO htt
 RUN cd libraries && git clone https://github.com/enyo/dropzone.git && git clone https://github.com/desandro/imagesloaded.git && git clone https://github.com/desandro/masonry.git
 #   https://www.drupal.org/project/slick
 RUN cd libraries && git clone https://github.com/kenwheeler/slick.git && git clone https://github.com/gdsmith/jquery.easing.git
+#   https://drupal-media.gitbooks.io/drupal8-guide/content/modules/media/installation.html
+RUN cd libraries && git clone https://github.com/fengyuanchen/cropper.git && git clone https://github.com/dinbror/blazy.git
 
 # Initial configuration for the 'all' site ...
 COPY filesystem/var/www/html/ /var/www/html

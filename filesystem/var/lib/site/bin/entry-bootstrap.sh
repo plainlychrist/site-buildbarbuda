@@ -220,7 +220,6 @@ function enable_required_modules {
 
   echo Enabling the Video Embed Field module ...
   drush -y pm-enable video_embed_field
-  drush -y pm-enable video_embed_wysiwyg
   drush -y pm-enable video_embed_media
 
   echo Enabling the Slick Media module ...
@@ -245,6 +244,10 @@ function enable_required_modules {
 
   echo Enabling our Token Page Pushdown module ...
   drush -y pm-enable token_page_pushdown
+
+  echo Enabling the Media Entity modules ...
+  drush -y pm-enable media_entity_document
+  drush -y pm-enable media
 
   # If there was new config, get the database in sync
   drush -y entity-updates
