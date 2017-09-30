@@ -185,7 +185,7 @@ function enable_required_modules {
   echo Setting DirectJude as the default theme, which is our desired theme
   drush -y cset system.theme default directjude
 
-  echo Enabling the Loadbalancing cookie
+  echo Enabling our Loadbalancing cookie module ...
   drush -y pm-enable loadbalancing_cookie
 
   echo Enabling the Group module ...
@@ -242,6 +242,9 @@ function enable_required_modules {
 
   echo Enabling the Config Ignore module ...
   drush -y pm-enable config_ignore
+
+  echo Enabling our Token Page Pushdown module ...
+  drush -y pm-enable token_page_pushdown
 
   # If there was new config, get the database in sync
   drush -y entity-updates

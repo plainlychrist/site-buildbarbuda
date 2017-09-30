@@ -1,0 +1,97 @@
+<?php
+
+/**
+ * @file
+ * Contains token_page_pushdown.module.
+ *
+ * This module simply takes rudiedirkx's patch at https://www.drupal.org/node/919760#comment-9973163
+ * and updates it for Drupal 8.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\EntityManagerInterface;
+
+/**
+ * Implements hook_help().
+ */
+function token_page_pushdown_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the token_page_pushdown module.
+    case 'help.page.token_page_pushdown':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Token Page Pushdown') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_token_info().
+ */
+function token_page_pushdown_token_info() {
+  $info = array();
+
+  $info['types'] = array(
+    'current-page-pushdown' => array(
+      'name' => t('Current page pushdown'),
+      'description' => t('Tokens related to the current page request, with all the entity types pushed down.'),
+    ),
+  );
+
+  $allEntities = \Drupal::entityTypeManager()->getDefinitions();
+  foreach ($allEntities as $entity_type => $entity_info) {
+    $info['tokens']['current-page-pushdown'][$entity_type] = array(
+      'name' => t('The current %type', array('%type' => $entity_type)),
+      'description' => t("The current page object if that's a %type", array('%type' => $entity_type)),
+      'type' => str_replace('taxonomy_', '', $entity_type),
+    );
+  }
+
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function token_page_pushdown_tokens($type, $tokens, array $data = array(), array $options = array(), \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata) {
+  $replacements = array();
+
+  if ($type == 'current-page-pushdown') {
+    $allEntities = \Drupal::entityTypeManager()->getDefinitions();
+    foreach ($tokens as $name => $original) {
+      $parts = explode(':', $name);
+      $entity_type = $parts[0];
+
+      // This left-over is an entity type.
+      if (isset($allEntities[$entity_type])) {
+
+        $entity_id = \Drupal::routeMatch()->getParameter($entity_type);
+        if (!$entity_id) {
+          continue;
+        }
+
+        $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
+
+        // No child properties, so load the entity label.
+        if ($name == $entity_type) {
+          $replacements[$original] = $entity->label();
+        }
+        // Load child properties via recursive tokens.
+        else {
+          $_tokens = array($name => $original);
+          $_tokens = \Drupal::token()->findWithPrefix($_tokens, $entity_type);
+
+          // Stupid taxonomy token types...
+          $token_type = str_replace('taxonomy_', '', $entity_type);
+          $_replacements = \Drupal::token()->generate($token_type, $_tokens, array($token_type => $entity), $options, $bubbleable_metadata);
+          $replacements += $_replacements;
+        }
+      }
+    }
+  }
+
+  // An array of replacement values keyed by original token string.
+  return $replacements;
+}

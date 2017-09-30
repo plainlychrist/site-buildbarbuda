@@ -1,0 +1,7 @@
+name: Token Page Pushdown
+type: module
+description: Push down page tokens onto all of its components, especially embedded webforms
+core: 8.x
+package: Custom
+dependencies:
+  - token

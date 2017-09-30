@@ -1,0 +1,14 @@
+{
+  "name": "drupal/token_page_pushdown",
+  "type": "drupal-module",
+  "description": "Push tokens from a page down to all of its components, especially embedded webforms",
+  "keywords": ["Drupal"],
+  "license": "MIT",
+  "homepage": "https://www.drupal.org/project/token_page_pushdown",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/token_page_pushdown",
+    "source": "http://cgit.drupalcode.org/token_page_pushdown"
+  },
+  "require": { }
+}
