@@ -24,6 +24,7 @@ find /var/www/html/vendor -print0 | xargs -0 chown drupaladmin
 find /var/www/html/modules -print0 | xargs -0 chmod u+w
 find /var/www/html/modules -print0 | xargs -0 chown drupaladmin
 chmod -R a+w /var/www/html/sites/all/themes/directjude
+install -o drupaladmin -g drupaladmin -d modules/custom
 
 # Adjust history permissions
 if [[ -e /root/.bash_history ]]; then
