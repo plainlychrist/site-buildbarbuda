@@ -150,9 +150,10 @@ set -x
 chmod -R a-w /var/www/html
 install -o drupaladmin -g www-data -m 755 -d /var/www/html/modules
 install -o drupaladmin -g www-data -m 750 -d /var/www/html/sites/default/files/public-backups
-chown -R drupaladmin:www-data /var/www/html/sites/default/files /var/lib/site/storage-config/sync
+chown -R drupaladmin:www-data /var/www/html/sites/default/files /var/lib/site/storage-config/sync /var/www/private
 find /var/www/html/sites/default/files -type d -print0 | xargs -0 chmod 770
 find /var/lib/site/storage-config/sync -type d -print0 | xargs -0 chmod 770
+find /var/www/private -type d -print0 | xargs -0 chmod 770
 chown -R www-data:drupaladmin /var/lib/site/storage-config/active # the update.php will try to chmod here, which means www-data needs to be owner
 find /var/lib/site/storage-config/active -type d -print0 | xargs -0 chmod 770
 find /var/lib/site/storage-config/active -type f -print0 | xargs -0 --no-run-if-empty chmod 664
