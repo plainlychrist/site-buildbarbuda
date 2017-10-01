@@ -249,6 +249,10 @@ function enable_required_modules {
   drush -y pm-enable media_entity_document
   drush -y pm-enable media
 
+  echo Enabling the Page Manager modules ...
+  drush -y pm-enable page_manager
+  drush -y pm-enable page_manager_ui
+
   # If there was new config, get the database in sync
   drush -y entity-updates
 }
