@@ -34,6 +34,9 @@ if [[ -e /home/drupaladmin/.bash_history ]]; then
   chown drupaladmin:drupaladmin /home/drupaladmin/.bash_history
 fi
 
+# Other perms
+chown drupaladmin:drupaladmin /home/drupaladmin/.vimrc
+
 # Install Drupal Console
 runuser -s /bin/bash -c '/home/drupaladmin/bin/composer require drupal/console:~1.0 --prefer-dist --optimize-autoloader' drupaladmin
 
