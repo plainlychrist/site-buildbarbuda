@@ -267,6 +267,9 @@ RUN ~/bin/composer require \
 # Install Drupal 8 (pre-8.4) media module
 RUN cd modules && git clone https://github.com/drupal-media/media.git
 
+# Modify Media so it uses our family permissions
+RUN find . -regex '.*/src/Entity/Media.php' -print0 | xargs --verbose -0 sed -i 's#Drupal\\media_entity\\MediaAccessController#Drupal\\family_organization_permissions\\FamilyOrganizationMediaAccessController#'
+
 # Install Bootstrap base theme
 RUN ~/bin/composer require \
         "drupal/bootstrap ${DRUPAL_BOOTSTRAP_VERSION}"
