@@ -1,0 +1,197 @@
+<?php
+
+/**
+ * @file
+ * Contains family_organization_permissions.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function family_organization_permissions_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the family_organization_permissions module.
+    case 'help.page.family_organization_permissions':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Gives permissions to family members and organization members') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+// The hooks are documented at:
+// https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Entity%21entity.api.php/group/entity_crud/8.3.x
+
+/**
+ * Implements hook_group_insert().
+ *
+ * When a family/organization group is created, a role is created.
+ */
+function family_organization_permissions_group_insert(Drupal\group\Entity\Group $group) {
+	$famorg_type = _family_organization_permissions_get_if_family_or_org_for_group($group);
+	if (is_null($famorg_type)) {
+		return;
+	}
+
+	\Drupal::logger('family_organization_permissions')->notice('Creating a role for group type @t with id @id and label @label', array('@t'=>$famorg_type, '@id'=>$group->id(), '@label'=>$group->label()));
+
+	// insert a new role
+	$rid = _family_organization_permissions_get_role_id('view', $famorg_type, $group);
+	$label = _family_organization_permissions_get_role_label('view', $famorg_type, $group);
+	$data = array('id' => $rid, 'label' => $label);
+	$role = \Drupal\user\Entity\Role::create($data);
+	$role->save();
+}
+
+/**
+ * Implements hook_group_update().
+ *
+ * When a family/organization group is updated, a role is created in case not already done OR the role label is updated.
+ */
+function family_organization_permissions_group_update(Drupal\group\Entity\Group $group) {
+	$famorg_type = _family_organization_permissions_get_if_family_or_org_for_group($group);
+	if (is_null($famorg_type)) {
+		return;
+	}
+
+	\Drupal::logger('family_organization_permissions')->notice('Creating or updating a role for group type @t with id @id and label @label', array('@t'=>$famorg_type, '@id'=>$group->id(), '@label'=>$group->label()));
+
+	// insert a new role, or update it
+	$rid = _family_organization_permissions_get_role_id('view', $famorg_type, $group);
+	$label = _family_organization_permissions_get_role_label('view', $famorg_type, $group);
+	$role = \Drupal\user\Entity\Role::load($rid);
+	if ($role) {
+		// We have an existing role, so only update it if the label needs changing
+		if ($role->label() != $label) {
+			$role->set('label', $label);
+			$role->save();
+		}
+	} else {
+		// We don't have a role, so create it
+		$data = array('id' => $rid, 'label' => $label);
+		$role = \Drupal\user\Entity\Role::create($data);
+		$role->save();
+	}
+}
+
+/**
+ * Implements hook_group_delete().
+ *
+ * When a family/organization group is deleted, the role is deleted if it exists.
+ */
+function family_organization_permissions_group_delete(Drupal\group\Entity\Group $group) {
+	$famorg_type = _family_organization_permissions_get_if_family_or_org_for_group($group);
+	if (is_null($famorg_type)) {
+		return;
+	}
+	\Drupal::logger('family_organization_permissions')->notice('Got group_delete for type @t with id @id', array('@t'=>$famorg_type, '@id'=>$group->id()));
+
+	// delete the role, if any
+	$rid = _family_organization_permissions_get_role_id('view', $famorg_type, $group);
+	$role = \Drupal\user\Entity\Role::load($rid);
+	if ($role) {
+		$role->delete();
+	}
+}
+
+/**
+ * Implements hook_group_content_insert().
+ *
+ * When someone has joined a family/organization group, the user joins the group role.
+ */
+function family_organization_permissions_group_content_insert(Drupal\group\Entity\GroupContent $group_content) {
+	$member_details = _family_organization_permissions_get_if_member_details_for_group_content($group_content);
+	if (is_null($member_details)) {
+		return;
+	}
+
+	\Drupal::logger('family_organization_permissions')->notice('Granting view access since just joined as @d', array( '@d' => json_encode($member_details) ));
+
+	// join the group role
+	$group = $group_content->getGroup();
+	$famorg_type = $member_details['group_type_id'];
+	$rid = _family_organization_permissions_get_role_id('view', $famorg_type, $group);
+	$user = \Drupal\user\Entity\User::load($member_details['user_id']);
+	if ($user) {
+		$user->addRole($rid);
+		$user->save();
+	}
+}
+
+/**
+ * Implements hook_group_content_delete().
+ *
+ * When someone has left a family/organization group, the user leaves the group role.
+ */
+function family_organization_permissions_group_content_delete(Drupal\group\Entity\GroupContent $group_content) {
+	$member_details = _family_organization_permissions_get_if_member_details_for_group_content($group_content);
+	if (is_null($member_details)) {
+		return;
+	}
+
+	\Drupal::logger('family_organization_permissions')->notice('Revoking view access since just left as @d', array( '@d' => json_encode($member_details) ));
+
+	// leave the group role
+	$group = $group_content->getGroup();
+	$famorg_type = $member_details['group_type_id'];
+	$rid = _family_organization_permissions_get_role_id('view', $famorg_type, $group);
+	$user = \Drupal\user\Entity\User::load($member_details['user_id']);
+	if ($user) {
+		$user->removeRole($rid);
+		$user->save();
+	}
+}
+
+function _family_organization_permissions_get_if_family_or_org_for_group(Drupal\Core\Entity\EntityInterface $entity) {
+	// We only care about Groups
+	if (!($entity instanceof Drupal\group\Entity\Group)) {
+		return NULL;
+	}
+
+	/** @var \Drupal\group\Entity\GroupType $group_type */
+	$group_type = $entity->getGroupType();
+
+	// We only care about family and organization groups
+	if ($group_type->id() != 'family' && $group_type->id() != 'organization') {
+		return NULL;
+	}
+
+	return $group_type->id();
+}
+
+function _family_organization_permissions_get_if_member_details_for_group_content(Drupal\Core\Entity\EntityInterface $entity) {
+	//\Drupal::logger('family_organization_permissions')->notice('Checking for entity class @t with id @id', array('@t' => get_class($entity), '@id' => $entity->id()));
+
+	// We only care about Group Content
+	if (!($entity instanceof Drupal\group\Entity\GroupContent)) {
+		return NULL;
+	}
+
+	/** @var \Drupal\group\Entity\GroupContentType $group_content_type */
+	$group_content_type = $entity->getGroupContentType();
+
+	// We only care about 'group_membership' plugins
+	// See http://cgit.drupalcode.org/group/tree/src/GroupMembershipLoader.php
+	if ($group_content_type->getContentPluginId() != 'group_membership') {
+		return NULL;
+	}
+
+	//\Drupal::logger('family_organization_permissions')->notice('For group @g, found group content class @t with group content type id @id and group type id @gtid for group content type plugin id @gctpluginid', array('@t' => get_class($group_content_type), '@id' => $group_content_type->id(), '@gtid' => $group_content_type->getGroupTypeId(), '@gctpluginid' => $group_content_type->getContentPluginId(), '@g' => $entity->getGroup()->id() ));
+	return array(
+		'group_id' => $entity->getGroup()->id(),
+		'group_type_id' => $group_content_type->getGroupTypeId(),
+		'user_id' => $entity->getEntity()->id(),
+	);
+}
+
+function _family_organization_permissions_get_role_id(string $access, string $famorg_type, Drupal\group\Entity\Group $group) {
+	return sprintf('%s_%s_%s', $access, $famorg_type, $group->id());
+}
+
+function _family_organization_permissions_get_role_label(string $access, string $famorg_type, Drupal\group\Entity\Group $group) {
+	return sprintf('%s %s %s', ucwords($access), ucwords($famorg_type), $group->label());
+}

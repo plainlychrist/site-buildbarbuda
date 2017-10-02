@@ -1,0 +1,2 @@
+permission_callbacks:
+    - Drupal\family_organization_permissions\FamilyOrganizationPermissions::permissions

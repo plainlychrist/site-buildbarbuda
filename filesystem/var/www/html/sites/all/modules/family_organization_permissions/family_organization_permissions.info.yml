@@ -1,0 +1,8 @@
+name: Family Organization Permissions
+type: module
+description: Gives Media permissions to family members and organization members. Each family or organization group gets a view role. Just having the role gives a user access to view the family or organization Media; you do not need to set individual permissions.
+core: 8.x
+package: Custom
+dependencies:
+  - group
+  - media_entity
