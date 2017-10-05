@@ -1,3 +1,4 @@
 # Generated within Dockerfile buid
 filesystem/var/www/html/sites/all/themes/directjude/css/style.css
 filesystem/var/www/html/sites/all/themes/directjude/css/style.css.map
+*.swp

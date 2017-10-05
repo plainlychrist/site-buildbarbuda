@@ -60,6 +60,7 @@ docker exec site-buildbarbuda bash -c 'cd /tmp && chmod -R a+w /var/www/html/sit
 ```
 docker cp filesystem-dev/root site-buildbarbuda:/
 docker cp filesystem-dev/home site-buildbarbuda:/
+docker cp filesystem-dev/var site-buildbarbuda:/
 docker exec -it site-buildbarbuda /root/dev.sh
 
 docker exec -it site-buildbarbuda env - TERM=xterm-color /sbin/runuser -l -s /bin/bash drupaladmin

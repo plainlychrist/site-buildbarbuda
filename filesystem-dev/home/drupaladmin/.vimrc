@@ -7,12 +7,13 @@ set wrapmargin=8
 syntax on
 set ruler
 
-set tabstop=2
+set tabstop=8
 set shiftwidth=2
 set hidden
 filetype indent on
 filetype plugin on
 set autoindent
+set expandtab
 
 "allow deletion of previously entered data in insert mode
 set backspace=indent,eol,start

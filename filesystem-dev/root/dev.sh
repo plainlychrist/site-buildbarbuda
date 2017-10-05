@@ -53,6 +53,12 @@ fi
 # Just use Drupal Console to install (easier than composer( ...
 cd /var/www/html
 
+# Enable development settings
+if ! tail -n1 sites/default/settings.php | grep -q settings.local.php; then
+  echo "include \$app_root . '/' . \$site_path . '/settings.local.php';" >> sites/default/settings.php
+fi
+
 # Install Devel
 runuser -s /bin/bash -c '/home/drupaladmin/bin/drupal module:install devel --latest' drupaladmin
+runuser -s /bin/bash -c '/home/drupaladmin/bin/drupal module:install kint --latest' drupaladmin
 runuser -s /bin/bash -c '/home/drupaladmin/bin/drupal module:install masquerade --latest' drupaladmin
