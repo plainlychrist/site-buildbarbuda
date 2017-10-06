@@ -148,17 +148,31 @@ function family_organization_permissions_group_content_delete(Drupal\group\Entit
 }
 
 /**
- * Implements hook_preprocess_entity_add_list().
- *
- * This overrides template_preprocess_entity_add_list() to make the correct family/org links, in the
- * pages like /family/1/media/add
+ * Implements hook_media_prepare_form().
  */
-function family_organization_permissions_preprocess_entity_add_list(&$variables) {
-  ksm($variables);
-  foreach ($variables['bundles'] as $bundle_name => $bundle_info) {
-    $variables['bundles'][$bundle_name]['description'] = [
-      '#markup' => $bundle_info['description']['#markup'],
-    ];
+function family_organization_permissions_media_prepare_form(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Form\FormStateInterface $form_state) {
+  // must have a {group} in the url
+  $group = \Drupal::routeMatch()->getCurrentRouteMatch()->getParameter('group');
+  if (!is_a($group, 'Drupal\group\Entity\Group')) {
+    return;
+  }
+
+  if (!_family_organization_permissions_get_if_family_or_org_for_group($group)) {
+    return;
+  }
+  //ksm(\Drupal::routeMatch()->getCurrentRouteMatch()->getParameter('group'));
+
+  // must have a field: Allowed Families and Organizations
+  $field_allowed_families_and_organ = $entity->get('field_allowed_families_and_organ');
+  if (!is_a($field_allowed_families_and_organ, 'Drupal\Core\Field\EntityReferenceFieldItemList')) {
+    return;
+  }
+
+  // add the group, if none already exist
+  if ($field_allowed_families_and_organ->count() == 0) {
+    $item = $field_allowed_families_and_organ->appendItem();
+    $item->target_id = $group->id();
+    //ksm(array('op3'=>$operation, 'allowed'=>$field_allowed_families_and_organ, 'fs'=>$form_state, 'item'=>$item));
   }
 }
 
