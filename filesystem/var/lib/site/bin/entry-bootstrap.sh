@@ -200,6 +200,7 @@ function enable_required_modules {
   drush -y pm-enable pathauto
 
   echo Enabling the Metatag module ...
+  drush -y pm-enable serialization # bad packaging; see https://www.drupal.org/node/2899699
   drush -y pm-enable metatag
 
   echo Enabling the Views Slideshow module ...
