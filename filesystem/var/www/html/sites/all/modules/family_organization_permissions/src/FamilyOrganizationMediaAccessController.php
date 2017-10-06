@@ -15,7 +15,7 @@ class FamilyOrganizationMediaAccessController extends EntityAccessControlHandler
   /**
    * {@inheritdoc}
    */
-	protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     if ($account->hasPermission('administer media')) {
       return AccessResult::allowed()->cachePerPermissions();
     }
@@ -27,8 +27,6 @@ class FamilyOrganizationMediaAccessController extends EntityAccessControlHandler
         // @var Drupal\media_entity_image\Plugin\MediaEntity\Type\Image $entity->getType()
         // @var Drupal\media_entity\Entity\Media $entity
         if ($account && is_a($entity, 'Drupal\media_entity\Entity\Media')) {
-          $rs = $account->getRoles();
-
           // @var Drupal\Core\Field\FieldItemList $entity->getFields()
           if ($entity->hasField('field_allowed_families_and_organ')) {
             $field_allowed_families_and_organ = $entity->get('field_allowed_families_and_organ');
@@ -36,9 +34,9 @@ class FamilyOrganizationMediaAccessController extends EntityAccessControlHandler
             if (is_a($field_allowed_families_and_organ, 'Drupal\Core\Field\EntityReferenceFieldItemList')) {
               // @var \Drupal\Core\Entity\EntityInterface[] $allowed_families_and_organ
               $allowed_families_and_organ = $field_allowed_families_and_organ->referencedEntities();
+              // @var \Drupal\group\Entity\Group $allowed_family_or_org
               foreach ($allowed_families_and_organ as $allowed_family_or_org) {
-                $role = sprintf('%s_%s_%s', 'view', $allowed_family_or_org->getGroupType()->id(), $allowed_family_or_org->id());
-                if (in_array($role, $rs)) {
+                if (_family_organization_permissions_access('view', $allowed_family_or_org, $account)) {
                   $is_family = true;
                   break;
                 }

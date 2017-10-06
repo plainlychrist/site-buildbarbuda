@@ -1,2 +1,4 @@
+create my families and organizations media:
+  title: 'Create my families and organizations media'
 permission_callbacks:
     - Drupal\family_organization_permissions\FamilyOrganizationPermissions::permissions

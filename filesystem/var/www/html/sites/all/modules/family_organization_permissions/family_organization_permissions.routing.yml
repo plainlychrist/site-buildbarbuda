@@ -1,0 +1,66 @@
+entity.media.family.add_page:
+  path: 'family/{group}/media/add'
+  defaults: 
+    _controller: '\Drupal\family_organization_permissions\FamilyOrganizationController::addMediaPage'
+    _title_callback: '\Drupal\family_organization_permissions\FamilyOrganizationController::addFamilyMediaTitle'
+  requirements: 
+    _permission: 'create my families and organizations media'
+    _custom_access: '\Drupal\family_organization_permissions\FamilyOrganizationController::accessMedia'
+    group: '^[0-9]+'
+
+entity.media.organization.add_page:
+  path: 'organization/{group}/media/add'
+  defaults: 
+    _controller: '\Drupal\family_organization_permissions\FamilyOrganizationController::addMediaPage'
+    _title_callback: '\Drupal\family_organization_permissions\FamilyOrganizationController::addOrganizationMediaTitle'
+  requirements: 
+    _permission: 'create my families and organizations media'
+    _custom_access: '\Drupal\family_organization_permissions\FamilyOrganizationController::accessMedia'
+    group: '^[0-9]+'
+
+# Mimic all the settings from: drupal dr entity.media.add_form
+# Defined in "core/lib/Drupal/Core/Entity/Routing/DefaultHtmlRouteProvider.php
+
+entity.media.family.add_form:
+  path: '/family/{group}/media/add/{media_bundle}'
+  defaults:
+    _entity_form: 'media.default'
+    entity_type_id: 'media'
+    _title_callback: '\Drupal\family_organization_permissions\FamilyOrganizationController::addFamilyMediaBundleTitle'
+    bundle_parameter: 'media_bundle'
+  requirements: 
+    _permission: 'create my families and organizations media'
+    _custom_access: '\Drupal\family_organization_permissions\FamilyOrganizationController::accessMedia'
+    group: '^[0-9]+'
+  options:
+    admin_route: 1
+    parameters:
+      media_bundle:
+        type: 'entity:media_bundle'
+        with_config_overrides: true
+      group:
+        type: 'entity:group'
+        with_config_overrides: true
+
+entity.media.organization.add_form:
+  path: '/organization/{group}/media/add/{media_bundle}'
+  defaults:
+    _entity_form: 'media.default'
+    entity_type_id: 'media'
+    _title_callback: '\Drupal\family_organization_permissions\FamilyOrganizationController::addOrganizationMediaBundleTitle'
+    bundle_parameter: 'media_bundle'
+  requirements: 
+    _permission: 'create my families and organizations media'
+    _custom_access: '\Drupal\family_organization_permissions\FamilyOrganizationController::accessMedia'
+    group: '^[0-9]+'
+  options:
+    admin_route: 1
+    parameters:
+      media_bundle:
+        type: 'entity:media_bundle'
+        with_config_overrides: true
+      group:
+        type: 'entity:group'
+        with_config_overrides: true
+#route_callbacks:
+#  - Drupal\family_organization_permissions\FamilyOrganizationRoutes::routes

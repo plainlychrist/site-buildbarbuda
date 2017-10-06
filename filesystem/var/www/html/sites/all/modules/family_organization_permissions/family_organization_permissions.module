@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Implements hook_help().
@@ -40,8 +41,8 @@ function family_organization_permissions_group_insert(Drupal\group\Entity\Group 
 	\Drupal::logger('family_organization_permissions')->notice('Creating a role for group type @t with id @id and label @label', array('@t'=>$famorg_type, '@id'=>$group->id(), '@label'=>$group->label()));
 
 	// insert a new role
-	$rid = _family_organization_permissions_get_role_id('view', $famorg_type, $group);
-	$label = _family_organization_permissions_get_role_label('view', $famorg_type, $group);
+	$rid = _family_organization_permissions_get_role_id('view', $group);
+	$label = _family_organization_permissions_get_role_label('view', $group);
 	$data = array('id' => $rid, 'label' => $label);
 	$role = \Drupal\user\Entity\Role::create($data);
 	$role->save();
@@ -61,8 +62,8 @@ function family_organization_permissions_group_update(Drupal\group\Entity\Group 
 	\Drupal::logger('family_organization_permissions')->notice('Creating or updating a role for group type @t with id @id and label @label', array('@t'=>$famorg_type, '@id'=>$group->id(), '@label'=>$group->label()));
 
 	// insert a new role, or update it
-	$rid = _family_organization_permissions_get_role_id('view', $famorg_type, $group);
-	$label = _family_organization_permissions_get_role_label('view', $famorg_type, $group);
+	$rid = _family_organization_permissions_get_role_id('view', $group);
+	$label = _family_organization_permissions_get_role_label('view', $group);
 	$role = \Drupal\user\Entity\Role::load($rid);
 	if ($role) {
 		// We have an existing role, so only update it if the label needs changing
@@ -91,7 +92,7 @@ function family_organization_permissions_group_delete(Drupal\group\Entity\Group 
 	\Drupal::logger('family_organization_permissions')->notice('Got group_delete for type @t with id @id', array('@t'=>$famorg_type, '@id'=>$group->id()));
 
 	// delete the role, if any
-	$rid = _family_organization_permissions_get_role_id('view', $famorg_type, $group);
+	$rid = _family_organization_permissions_get_role_id('view', $group);
 	$role = \Drupal\user\Entity\Role::load($rid);
 	if ($role) {
 		$role->delete();
@@ -114,7 +115,7 @@ function family_organization_permissions_group_content_insert(Drupal\group\Entit
 	// join the group role
 	$group = $group_content->getGroup();
 	$famorg_type = $member_details['group_type_id'];
-	$rid = _family_organization_permissions_get_role_id('view', $famorg_type, $group);
+	$rid = _family_organization_permissions_get_role_id('view', $group);
 	$user = \Drupal\user\Entity\User::load($member_details['user_id']);
 	if ($user) {
 		$user->addRole($rid);
@@ -138,12 +139,27 @@ function family_organization_permissions_group_content_delete(Drupal\group\Entit
 	// leave the group role
 	$group = $group_content->getGroup();
 	$famorg_type = $member_details['group_type_id'];
-	$rid = _family_organization_permissions_get_role_id('view', $famorg_type, $group);
+	$rid = _family_organization_permissions_get_role_id('view', $group);
 	$user = \Drupal\user\Entity\User::load($member_details['user_id']);
 	if ($user) {
 		$user->removeRole($rid);
 		$user->save();
 	}
+}
+
+/**
+ * Implements hook_preprocess_entity_add_list().
+ *
+ * This overrides template_preprocess_entity_add_list() to make the correct family/org links, in the
+ * pages like /family/1/media/add
+ */
+function family_organization_permissions_preprocess_entity_add_list(&$variables) {
+  ksm($variables);
+  foreach ($variables['bundles'] as $bundle_name => $bundle_info) {
+    $variables['bundles'][$bundle_name]['description'] = [
+      '#markup' => $bundle_info['description']['#markup'],
+    ];
+  }
 }
 
 function _family_organization_permissions_get_if_family_or_org_for_group(Drupal\Core\Entity\EntityInterface $entity) {
@@ -188,12 +204,26 @@ function _family_organization_permissions_get_if_member_details_for_group_conten
 	);
 }
 
-function _family_organization_permissions_get_role_id(string $access, string $famorg_type, Drupal\group\Entity\Group $group) {
+function _family_organization_permissions_get_role_id(string $access, Drupal\group\Entity\Group $group) {
 	// The group is an entity, so it has a unique id (whether family or organization).
 	// So not necessary for the role id, but makes debugging easier
-	return sprintf('%s_%s_%s', $access, $famorg_type, $group->id());
+	return sprintf('%s_%s_%s', $access, $group->getGroupType()->id(), $group->id());
 }
 
-function _family_organization_permissions_get_role_label(string $access, string $famorg_type, Drupal\group\Entity\Group $group) {
-	return sprintf('%s %s %s', ucwords($access), ucwords($famorg_type), $group->label());
+function _family_organization_permissions_get_role_label(string $access, Drupal\group\Entity\Group $group) {
+	return sprintf('%s %s %s', ucwords($access), ucwords($group->getGroupType()->id()), $group->label());
+}
+
+function _family_organization_permissions_access(string $access, Drupal\group\Entity\Group $group, AccountInterface $account) {
+	\Drupal::logger('family_organization_permissions')->notice('Accessing group with id @id and label @label', array('@id'=>$group->id(), '@label'=>$group->label()));
+  if (!$account->hasPermission('create my families and organizations media')) {
+    return false;
+  }
+  // @var string[] $accountRoles
+  $accountRoles = $account->getRoles();
+  $rid = _family_organization_permissions_get_role_id($access, $group);
+  if (in_array($rid, $accountRoles)) {
+    return true;
+  }
+	return false;
 }
