@@ -29,7 +29,7 @@ class FamilyOrganizationPermissions implements ContainerInjectionInterface {
   }
 
   /**
-   * Constructs a new FamilyPermissions instance.
+   * Constructs a new FamilyOrganizationPermissions instance.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
