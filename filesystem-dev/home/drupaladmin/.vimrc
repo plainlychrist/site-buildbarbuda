@@ -23,4 +23,8 @@ set ignorecase
 set smartcase
 set hlsearch
 
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+
 " End .vimrc

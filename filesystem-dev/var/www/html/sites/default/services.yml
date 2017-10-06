@@ -1,0 +1,13 @@
+# Installed by docs/RUNNING.md dev.sh instructions
+parameters:
+  twig.config:
+    debug: true
+    cache: false
+    auto_reload: true
+services:
+  config.storage:
+    class: Drupal\Core\Config\CachedStorage
+    arguments: ['@config.storage.active', '@cache.config']
+  config.storage.active:
+    class: Drupal\Core\Config\FileStorage
+    factory: Drupal\Core\Config\FileStorageFactory::getActive
