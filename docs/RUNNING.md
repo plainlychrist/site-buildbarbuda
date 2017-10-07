@@ -9,7 +9,7 @@ Then do these steps:
 ```bash
 sudo touch ~/site.drupaladmin.history ~/site.root.history
 docker rm -f site-buildbarbuda # this is fine if this fails
-docker run -d -p 443:443 --name site-buildbarbuda --env WEB_ADMIN_PASSWORD=...make...up...a...password -v ~/site.root.history:/root/.bash_history -v ~/site.drupaladmin.history:/home/drupaladmin/.bash_history plainlychrist/site-buildbarbuda:unstable --trust-this-ec2-host --trust-this-ec2-local-ipv4
+docker run -d -p 443:443 --name site-buildbarbuda --env WEB_ADMIN_PASSWORD=...make...up...a...password -v ~/site.root.history:/root/.bash_history -v ~/site.drupaladmin.history:/home/drupaladmin/.bash_history plainlychrist/site-buildbarbuda:latest --trust-this-ec2-host --trust-this-ec2-local-ipv4
 docker logs --follow site-buildbarbuda
 ```
 
@@ -23,7 +23,7 @@ docker logs --follow site-buildbarbuda
 ```bash
 touch $HOME/site.drupaladmin.history $HOME/site.root.history
 docker rm -f site-buildbarbuda # this is fine if this fails
-docker run -d -p 443:443 --name site-buildbarbuda --env WEB_ADMIN_PASSWORD=...make...up...a...password -v $HOME/plainlychrist.site.root.history:/root/.bash_history -v $HOME/plainlychrist.site.drupaladmin.history:/home/drupaladmin/.bash_history plainlychrist/site-buildbarbuda:unstable
+docker run -d -p 443:443 --name site-buildbarbuda --env WEB_ADMIN_PASSWORD=...make...up...a...password -v $HOME/plainlychrist.site.root.history:/root/.bash_history -v $HOME/plainlychrist.site.drupaladmin.history:/home/drupaladmin/.bash_history plainlychrist/site-buildbarbuda:latest
 docker logs --follow site-buildbarbuda
 ```
 
@@ -43,7 +43,7 @@ One terminal for running the website:
 ```bash
 cd $HOME/Documents/site-buildbarbuda
 docker rm -f site-buildbarbuda
-docker run -p 443:443 --name site-buildbarbuda --env WEB_ADMIN_PASSWORD=...make...up...a...password -v $HOME/plainlychrist.site.history:/root/.bash_history -v $HOME\Documents\site-buildbarbuda\filesystem\var\www\html\sites\all\themes:/var/www/html/sites/all/themes plainlychrist/site-buildbarbuda:unstable
+docker run -p 443:443 --name site-buildbarbuda --env WEB_ADMIN_PASSWORD=...make...up...a...password -v $HOME/plainlychrist.site.history:/root/.bash_history -v $HOME\Documents\site-buildbarbuda\filesystem\var\www\html\sites\all\themes:/var/www/html/sites/all/themes plainlychrist/site-buildbarbuda:latest
 ```
 
 Another terminal for automatically recompiling the CSS files:

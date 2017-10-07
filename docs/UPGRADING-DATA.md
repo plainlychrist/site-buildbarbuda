@@ -2,7 +2,7 @@
 
 Your typical workflow would be:
 
-1. Get the latest public Docker image with `docker pull plainlychrist/site-buildbarbuda:unstable`
+1. Get the latest public Docker image with `docker pull plainlychrist/site-buildbarbuda:latest`
 2. Run `site-buildbarbuda-ec2-linux-desktop` with [Docker Compose for site-buildbarbuda-ec2-linux-desktop](https://github.com/plainlychrist/applications/tree/master/site/site-buildbarbuda-ec2-linux-desktop)
 3. Log into your newly running website. Do whatever web site content changes you want (if any).
 4. Run any pending upgrades (usually from a Drupal security update that was autobuilt on GitHub) by going to https://your_new_site/update.php
@@ -23,7 +23,7 @@ Your typical workflow would be:
     ```
     (cd filesystem/var/lib/site/bootstrap/default && BURL=https://localhost/sites/default/files/public-backups/ && curl -k -s -o /tmp/latest.txt $BURL/latest.txt && LTT=$(< /tmp/latest.txt) && B=2010-01-01.00-00-000 && echo $B > latest.txt && curl -k -s -o $B.plain-dump.sql.txt $BURL/$LTT.plain-dump.sql.txt && curl -k -s -o $B.sanitized-dump.sql.txt $BURL/$LTT.sanitized-dump.sql.txt && curl -k -s -o $B.sanitized-restore.sql.txt $BURL/$LTT.sanitized-restore.sql.txt && curl -k -s -o $B.sites-default-files.tar.xz $BURL/$LTT.sites-default-files.tar.xz)
     ```
-10. Rebuild the Docker image on your machine with `docker build -t plainlychrist/site-buildbarbuda:unstable .`
+10. Rebuild the Docker image on your machine with `docker build -t plainlychrist/site-buildbarbuda:latest .`
 
 # Test the changes
 
