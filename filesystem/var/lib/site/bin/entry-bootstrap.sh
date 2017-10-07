@@ -364,7 +364,7 @@ else
     --site-name="BuildBarbuda.org" \
     --site-mail=no-reply@buildbarbuda.org \
     --verbose \
-    standard install_configure_form.update_status_module='array(FALSE,FALSE)'
+    standard install_configure_form.enable_update_status_module=NULL install_configure_form.enable_update_status_emails=NULL
 
   # enable all required modules
   enable_required_modules

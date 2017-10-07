@@ -196,7 +196,7 @@ RUN ~/bin/drush core-status
 USER root
 RUN rsync -ap sites/default/ sites/default-moveback && \
     install -o drupaladmin -g www-data -d /tmp/webform-libraries-sqlite && \
-    ~drupaladmin/bin/drush -y site-install --db-url="sqlite:///tmp/webform-libraries-sqlite/.ht.sqlite" && \
+    ~drupaladmin/bin/drush -y site-install standard install_configure_form.enable_update_status_module=NULL install_configure_form.enable_update_status_emails=NULL --db-url="sqlite:///tmp/webform-libraries-sqlite/.ht.sqlite" && \
     ~drupaladmin/bin/drush en webform -y && \
     ~drupaladmin/bin/drush webform-libraries-download && \
     rm -rf /tmp/webform-libraries-sqlite sites/default && \
