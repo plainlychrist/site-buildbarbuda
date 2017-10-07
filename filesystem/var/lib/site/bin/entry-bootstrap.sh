@@ -254,6 +254,9 @@ function enable_required_modules {
   drush -y pm-enable page_manager
   drush -y pm-enable page_manager_ui
 
+  echo Enabling our Family Organization permission modules ...
+  drush -y pm-enable family_organization_permissions
+
   # If there was new config, get the database in sync
   drush -y entity-updates
 }

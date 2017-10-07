@@ -25,8 +25,8 @@ find /var/www/html/modules -print0 | xargs -0 chmod u+w
 find /var/www/html/modules -print0 | xargs -0 chown drupaladmin
 chmod -R a+w /var/www/html/sites/all/themes/directjude
 install -o drupaladmin -g drupaladmin -d modules/custom
-chmod 664 /var/lib/site/storage-config/active/*.yml
-chown drupaladmin:www-data /var/lib/site/storage-config/active/*.yml
+find /var/lib/site/storage-config/active/ -name '*.yml' -print0 | xargs -0 chmod 644
+find /var/lib/site/storage-config/active/ -name '*.yml' -print0 | xargs -0 chown drupaladmin:www-data
 
 # Adjust history permissions
 if [[ -e /root/.bash_history ]]; then
@@ -40,7 +40,7 @@ fi
 chown drupaladmin:drupaladmin /home/drupaladmin/.vimrc
 
 # Install Drupal Console
-runuser -s /bin/bash -c '/home/drupaladmin/bin/composer require drupal/console:~1.0 --prefer-dist --optimize-autoloader' drupaladmin
+runuser -s /bin/bash -c '/home/drupaladmin/bin/composer require drupal/console:~1.0 drupal/devel:~1.2 drupal/masquerade:~2.0 --prefer-dist --optimize-autoloader' drupaladmin
 
 cd /home/drupaladmin
 
@@ -61,6 +61,6 @@ if ! tail -n1 sites/default/settings.php | grep -q settings.local.php; then
 fi
 
 # Install Devel
-runuser -s /bin/bash -c '/home/drupaladmin/bin/drupal module:install devel --latest' drupaladmin
-runuser -s /bin/bash -c '/home/drupaladmin/bin/drupal module:install kint --latest' drupaladmin
-runuser -s /bin/bash -c '/home/drupaladmin/bin/drupal module:install masquerade --latest' drupaladmin
+runuser -s /bin/bash -c '/home/drupaladmin/bin/drush en devel -y' drupaladmin
+runuser -s /bin/bash -c '/home/drupaladmin/bin/drush en kint -y' drupaladmin
+runuser -s /bin/bash -c '/home/drupaladmin/bin/drush en masquerade -y' drupaladmin

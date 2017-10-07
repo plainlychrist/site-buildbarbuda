@@ -308,6 +308,8 @@ RUN rm -f /usr/local/etc/php-fpm.d/zz-docker.conf
 RUN mkdir -p libraries/jquery.cycle && cd libraries/jquery.cycle && curl -LO https://malsup.github.io/jquery.cycle.all.js \
     && mkdir -p ../../libraries/jquery.hoverIntent && cd ../../libraries/jquery.hoverIntent && curl -LO http://cherne.net/brian/resources/jquery.hoverIntent.js \
     && mkdir -p ../../libraries/json2 && cd ../../libraries/json2 && curl -LO https://raw.githubusercontent.com/douglascrockford/JSON-js/master/json2.js
+#   Views Slideshow needs jquery.pause, but it isn't documented except during 'drush en'
+RUN cd libraries && git clone https://github.com/tobia/Pause.git jquery.pause
 #   https://drupal.org/project/file_browser
 RUN cd libraries && git clone https://github.com/enyo/dropzone.git && git clone https://github.com/desandro/imagesloaded.git && git clone https://github.com/desandro/masonry.git
 #   https://www.drupal.org/project/slick
