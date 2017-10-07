@@ -4,7 +4,7 @@
 # * https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/
 # * http://docs.projectatomic.io/container-best-practices/#
 
-FROM drupal:8.3-fpm
+FROM drupal:8.4-fpm
 
 LABEL name="plainlychrist/site-buildbarbuda" \
       version="1.0"
@@ -268,7 +268,9 @@ RUN ~/bin/composer require \
 RUN cd modules && git clone https://github.com/drupal-media/media.git
 
 # Modify Media so it uses our family permissions
+USER root
 RUN find . -regex '.*/src/Entity/Media.php' -print0 | xargs --verbose -0 sed -i 's#Drupal\\media_entity\\MediaAccessController#Drupal\\family_organization_permissions\\FamilyOrganizationMediaAccessController#'
+USER drupaladmin
 
 # Install Bootstrap base theme
 RUN ~/bin/composer require \
