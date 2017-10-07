@@ -9,8 +9,6 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\Group;
 
-//\Drupal::logger('family_organization_permissions')->notice('def 1');
-
 /**
  * Provides add-page for family and organization entities.
  *
@@ -58,11 +56,16 @@ class FamilyOrganizationController extends EntityController {
         '@entity_type' => $bundle_entity_type_label,
         '@add_link' => Link::createFromRoute($link_text, $link_route_name)->toString(),
       ]);
-      // Filter out the bundles the user doesn't have access to.
+      // Filter out the bundles the user doesn't have access to. Also filter bundles that do not
+      // have the 'Allowed Families and Organizations' field (not present means it is a public bundle).
       $access_control_handler = $this->entityTypeManager->getAccessControlHandler($entity_type_id);
+      $entity_field_manager = \Drupal::service('entity_field.manager');
+      $bundles_with_private_field = $entity_field_manager->getFieldMap()[$entity_type_id]['field_allowed_families_and_organ']['bundles'];
       foreach ($bundles as $bundle_name => $bundle_info) {
         $access = $access_control_handler->createAccess($bundle_name, NULL, [], TRUE);
         if (!$access->isAllowed()) {
+          unset($bundles[$bundle_name]);
+        } elseif (!in_array($bundle_name, $bundles_with_private_field)) {
           unset($bundles[$bundle_name]);
         }
         $this->renderer->addCacheableDependency($build, $access);
