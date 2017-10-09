@@ -49,7 +49,8 @@ ENV NGINX_VERSION="1.13.3-1~jessie" \
     DRUPAL_MEDIA_ENTITY_TWITTER_VERSION="~1.3" \
     DRUPAL_IMAGE_WIDGET_CROP_VERSION="~2.0" \
     DRUPAL_INLINE_ENTITY_FORM_VERSION="~1.0" \
-    DRUPAL_PAGE_MANAGER_VERSION="~4.0"
+    DRUPAL_PAGE_MANAGER_VERSION="~4.0" \
+    DRUPAL_TWIG_TWEAK_VERSION="~2.0"
 
 ########################
 ######## ROOT ##########
@@ -262,7 +263,8 @@ RUN ~/bin/composer require \
         "drupal/media_entity_twitter ${DRUPAL_MEDIA_ENTITY_TWITTER_VERSION}" \
         "drupal/image_widget_crop ${DRUPAL_IMAGE_WIDGET_CROP_VERSION}" \
         "drupal/inline_entity_form ${DRUPAL_INLINE_ENTITY_FORM_VERSION}" \
-        "drupal/page_manager ${DRUPAL_PAGE_MANAGER_VERSION}"
+        "drupal/page_manager ${DRUPAL_PAGE_MANAGER_VERSION}" \
+        "drupal/twig_tweak ${DRUPAL_TWIG_TWEAK_VERSION}"
 
 # Install Drupal 8 (pre-8.4) media module
 RUN cd modules && git clone https://github.com/drupal-media/media.git

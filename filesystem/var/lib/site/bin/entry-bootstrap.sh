@@ -257,6 +257,9 @@ function enable_required_modules {
   echo Enabling our Family Organization permission modules ...
   drush -y pm-enable family_organization_permissions
 
+  echo Enabling the Twig Tweak module ...
+  drush -y pm-enable twig_tweak
+
   # If there was new config, get the database in sync
   drush -y entity-updates
 }
