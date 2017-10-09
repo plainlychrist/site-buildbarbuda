@@ -5,6 +5,7 @@
  * Contains family_organization_permissions.module.
  */
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -174,6 +175,22 @@ function family_organization_permissions_media_prepare_form(\Drupal\Core\Entity\
     $item->target_id = $group->id();
     //ksm(array('op3'=>$operation, 'allowed'=>$field_allowed_families_and_organ, 'fs'=>$form_state, 'item'=>$item));
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function family_organization_permissions_form_user_login_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Alter login form and add own custom submit handler.
+  $form['#submit'][] = '_family_organization_permissions_user_login_form_submit';
+}
+
+/**
+ * Custom submit handler for login form.
+ */
+function _family_organization_permissions_user_login_form_submit($form, FormStateInterface $form_state) {
+  // <front> or route id
+  $form_state->setRedirect('view.my_groups.page_1');
 }
 
 function _family_organization_permissions_get_if_family_or_org_for_group(Drupal\Core\Entity\EntityInterface $entity) {
