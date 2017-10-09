@@ -45,3 +45,28 @@
     float: left
   }
 }
+
+.jumbotron {
+  .vertical-align {
+    padding-left: 30px !important;
+    padding-right: 30px !important;
+    position: absolute;
+    top: 50%;
+  }
+  .container {
+    position: relative;
+    height: 100%;
+    max-width: 100%;
+  }
+  .field--name-field-landing-image-text {
+    color: rgb(255, 255, 255);
+    h2 {
+      font-size: 36px;
+      line-height: 36px !important;
+      margin-bottom: 10px !important;
+    }
+  }
+  .a-spot-button {
+    border: 1px solid #FFF;
+  }
+}
