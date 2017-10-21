@@ -59,7 +59,6 @@
     max-width: 100%;
   }
   .field--name-field-landing-image-text {
-    color: rgb(255, 255, 255);
     h2 {
       font-size: 36px;
       line-height: 36px !important;
@@ -69,4 +68,14 @@
   .a-spot-button {
     border: 1px solid #FFF;
   }
+}
+
+.landing-page-1-actions, .landing-page-2-actions {
+  .field--name-field-landing-image-text {
+    color: rgb(255, 255, 255);
+  }
+}
+
+.landing-page-custom-calls-to-action-row {
+  padding-bottom: $padding-base-vertical;
 }
