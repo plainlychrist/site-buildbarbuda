@@ -205,7 +205,7 @@ function enable_required_modules {
 
   echo Enabling the Views Slideshow module ...
   drush -y pm-enable views_slideshow
-  drush -y pm-enable views_slideshow_cycle
+  echo "SKIPPING drush -y pm-enable views_slideshow_cycle BECAUSE Fatal error: Class 'Consolidation\SiteProcess\ProcessManager' not found in /home/drupaladmin/.composer/vendor/drush/drush/lib/Drush/SiteAlias/ProcessManager.php on line 20"
 
   echo Enabling the Display Suite module ...
   drush -y pm-enable ds
